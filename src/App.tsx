@@ -1,25 +1,21 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+// src/App.tsx
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
 import { Home } from "./pages/Home";
-import { PublicRoute } from "./components/routing/PublicRoute";
 import { Dashboard } from "./pages/Dashboard";
-// import { Users } from "./pages/Users";
-// import { Profile } from "./pages/Profile";
+import { Profile } from "./pages/Profile";
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
+import { PublicRoute } from "./components/routing/PublicRoute";
 
 function App() {
   return (
     <BrowserRouter>
       <Routes>
         <Route element={<MainLayout />}>
-          <Route
-            path="/"
-            element={
-              <PublicRoute>
-                <Home />
-              </PublicRoute>
-            }
-          />
+          {/* Rutas Públicas */}
+          <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
+
+          {/* Ruta Dashboard Protegida (Actúa como Layout) */}
           <Route
             path="/dashboard"
             element={
@@ -27,8 +23,14 @@ function App() {
                 <Dashboard />
               </ProtectedRoute>
             }
-          />
-        </Route> 
+          >
+            <Route path="profile" element={<Profile />} />
+            {/* <Route path="users" element={<Users />} /> */}
+          </Route>
+        </Route>
+
+        {/* Redirección por defecto si la ruta no existe */}
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   );
