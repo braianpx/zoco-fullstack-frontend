@@ -6,7 +6,7 @@ import { UserMenu } from "./UserMenu";
 export const Navbar: FC = () => {
   const { isAuthenticated, user, logout } = useAuth();
   return (
-    <nav className="w-full bg-white shadow-md px-6 py-4 flex justify-between items-center">
+    <nav className="w-full bg-white shadow-md px-6 py-4 flex justify-between items-center top-0 fixed z-50">
       {/* Logo / Nombre App */}
       <Link to="/" >
         <span className="text-2xl font-bold text-indigo-600 hover:text-indigo-500">
