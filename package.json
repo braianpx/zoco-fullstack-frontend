@@ -1,13 +1,14 @@
 {
   "name": "zoco-app",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "lint": "eslint src/**/*.{ts,tsx}",
     "type-check": "tsc --noEmit",
     "dev": "npm run lint && npm run type-check && vite",
-    "build": "tsc -b && vite build",
+    "build": "vite build",
+    "buildTwo": "tsc -b && vite build",
     "preview": "vite preview"
   },
   "dependencies": {
