@@ -21,3 +21,11 @@ export interface UserCreate {
   lastName: string
   password: string
 }
+
+export interface UserUpdate {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password?: string; 
+  roleName: string;
+}
