@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { validateUserField } from "./validators/new.user.validator"; 
-import { MapPin, GraduationCap, Lock, Shield, History, Calendar } from "lucide-react";
+import { MapPin, GraduationCap, Shield, History, Calendar } from "lucide-react";
 import type { UserResponse } from "../../types/user.types";
 import { useAuth } from "../../context/auth/useAuth";
 
@@ -21,19 +21,21 @@ interface Props {
 export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Props) => {
   const { user: currentUser } = useAuth();
   const isAdmin = currentUser?.roleName === "Admin";
+  
+  // Al pasar <UserFormData>, getValues() ya devuelve el tipo correcto sin necesidad de "as any"
   const { register, handleSubmit, getValues, formState: { errors } } = useForm<UserFormData>({ defaultValues });
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
       {/* 1. IDENTIDAD Y ROL */}
       <div className="grid grid-cols-2 gap-4">
-        <Input label="Nombre" placeholder="Nombre" error={errors.firstName?.message} {...register("firstName", { validate: (v) => validateUserField("firstName", v || "", getValues() as any) || true })} />
-        <Input label="Apellido" placeholder="Apellido" error={errors.lastName?.message} {...register("lastName", { validate: (v) => validateUserField("lastName", v || "", getValues() as any) || true })} />
+        <Input label="Nombre" placeholder="Nombre" error={errors.firstName?.message} {...register("firstName", { validate: (v) => validateUserField("firstName", v || "", getValues()) || true })} />
+        <Input label="Apellido" placeholder="Apellido" error={errors.lastName?.message} {...register("lastName", { validate: (v) => validateUserField("lastName", v || "", getValues()) || true })} />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 items-end">
         <div className="md:col-span-2">
-          <Input label="Email Institucional" error={errors.email?.message} {...register("email", { validate: (v) => validateUserField("email", v || "", getValues() as any) || true })} />
+          <Input label="Email Institucional" error={errors.email?.message} {...register("email", { validate: (v) => validateUserField("email", v || "", getValues()) || true })} />
         </div>
         <div>
           <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1 flex items-center gap-1"><Shield size={12}/> Rol</label>
@@ -43,61 +45,59 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
           </select>
         </div>
       </div>
-        {/* 2. SEGURIDAD */}
-      <div className="grid grid-cols-2 gap-4 bg-indigo-50/30 p-6 rounded-[2rem] border border-indigo-100">
-        <Input label={isEditing ? "Nueva Clave" : "Clave"} type="password" error={errors.password?.message} {...register("password", { validate: (v) => validateUserField("password", v || "", getValues() as any) || true })} />
+
+      {/* 2. SEGURIDAD */}
+      <div className="grid grid-cols-2 gap-4 bg-indigo-50/30 p-6 rounded-4xl border border-indigo-100">
+        <Input label={isEditing ? "Nueva Clave" : "Clave"} type="password" error={errors.password?.message} {...register("password", { validate: (v) => validateUserField("password", v || "", getValues()) || true })} />
         <Input label="Repetir Clave" type="password" error={errors.confirmPassword?.message} {...register("confirmPassword", { validate: (v) => !v || v === getValues("password") || "No coincide" })} />
       </div>
 
-      {/* 3. DATOS CONCATENADOS (DIRECCIONES Y ESTUDIOS) */}
+      {/* 3. DATOS CONCATENADOS */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-100">
+        <div className="bg-slate-50 rounded-4xl p-6 border border-slate-100">
           <span className="text-[10px] font-black uppercase text-rose-500 tracking-widest flex items-center gap-2 mb-3"><MapPin size={14}/> Direcciones</span>
           <div className="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
-            {(defaultValues as any)?.addresses?.length > 0 ? (defaultValues as any).addresses.map((a: any, i: number) => (
-              <div key={i} className="text-[11px] font-bold text-slate-600 bg-white p-3 rounded-xl border border-slate-50 shadow-sm leading-tight">
-                {/* CONCATENACIÓN: Calle - Ciudad - País */}
-                {`${a.street || 'S/N'} - ${a.city || 'Sin ciudad'} - ${a.country || 'Sin país'}`}
-              </div>
-            )) : <p className="text-xs text-slate-400 italic">No hay direcciones registradas.</p>}
+            {defaultValues?.addresses && defaultValues.addresses.length > 0 ? (
+              defaultValues.addresses.map((a, i) => (
+                <div key={i} className="text-[11px] font-bold text-slate-600 bg-white p-3 rounded-xl border border-slate-50 shadow-sm leading-tight">
+                  {`${a.street || 'S/N'} - ${a.city || 'Sin ciudad'} - ${a.country || 'Sin país'}`}
+                </div>
+              ))
+            ) : <p className="text-xs text-slate-400 italic">No hay direcciones registradas.</p>}
           </div>
         </div>
 
-        <div className="bg-slate-50 rounded-[2rem] p-6 border border-slate-100">
+        <div className="bg-slate-50 rounded-4xl p-6 border border-slate-100">
           <span className="text-[10px] font-black uppercase text-emerald-500 tracking-widest flex items-center gap-2 mb-3"><GraduationCap size={14}/> Estudios</span>
           <div className="space-y-2 max-h-32 overflow-y-auto pr-2 custom-scrollbar">
-             {(defaultValues as any)?.studies?.length > 0 ? (defaultValues as any).studies.map((s: any, i: number) => (
-              <div key={i} className="text-[11px] font-bold text-slate-600 bg-white p-3 rounded-xl border border-slate-50 shadow-sm leading-tight">
-                {/* CONCATENACIÓN: Título - Instituto - Inicio */}
-                {`${s.degree || 'S/T'} - ${s.institution || 'S/I'} (${s.startDate || 'S/F'})`}
-              </div>
-            )) : <p className="text-xs text-slate-400 italic">Sin estudios registrados.</p>}
+             {defaultValues?.studies && defaultValues.studies.length > 0 ? (
+               defaultValues.studies.map((s, i) => (
+                <div key={i} className="text-[11px] font-bold text-slate-600 bg-white p-3 rounded-xl border border-slate-50 shadow-sm leading-tight">
+                  {`${s.degree || 'S/T'} - ${s.institution || 'S/I'} (${s.startDate || 'S/F'})`}
+                </div>
+              ))
+            ) : <p className="text-xs text-slate-400 italic">Sin estudios registrados.</p>}
           </div>
         </div>
       </div>
 
-
-      {/* 4. SESSION LOGS (Estilo Original Corregido) */}
-      <div className="bg-slate-900 rounded-[2rem] p-6 text-white">
+      {/* 4. SESSION LOGS */}
+      <div className="bg-slate-900 rounded-4xl p-6 text-white">
         <div className="flex items-center gap-2 mb-4 text-indigo-300">
           <History size={16} />
           <span className="text-[10px] font-black uppercase tracking-widest">Historial de Sesiones</span>
         </div>
         
         <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar-dark">
-          {(defaultValues as any)?.sessionLogs?.length > 0 ? (
-            [...(defaultValues as any).sessionLogs]
+          {defaultValues?.sessionLogs && defaultValues.sessionLogs.length > 0 ? (
+            [...defaultValues.sessionLogs]
               .sort((a, b) => {
-                const dateA = new Date(a.loginTime || a.startDate || a).getTime();
-                const dateB = new Date(b.loginTime || b.startDate || b).getTime();
+                const dateA = new Date(a.loginTime || "").getTime();
+                const dateB = new Date(b.loginTime || "").getTime();
                 return dateB - dateA;
               })
-              .map((log: any, i: number) => {
-                // Extraemos la fecha de forma segura
-                const rawDate = log.loginTime || log.startDate || (typeof log === 'string' ? log : null);
-                const dateObj = new Date(rawDate);
-                
-                // Formateo simple para el span
+              .map((log, i) => {
+                const dateObj = new Date(log.loginTime || "");
                 const displayDate = !isNaN(dateObj.getTime()) 
                   ? `${dateObj.toLocaleDateString('es-AR')} - ${dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
                   : "Fecha no disponible";
@@ -115,15 +115,13 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
                 );
               })
           ) : (
-            <p className="text-xs text-slate-500 italic">No hay logs de actividad.</p>
+            <p className="text-xs text-slate-500 italic">No hay registros de sesión.</p>
           )}
         </div>
       </div>
 
-
-
-      <Button type="submit" variant="primary" className="w-full py-4 mt-2 shadow-2xl" disabled={isLoading}>
-        {isLoading ? "Enviando..." : isEditing ? "Actualizar Perfil" : "Crear Perfil"}
+      <Button type="submit" isLoading={isLoading} className="w-full py-4 rounded-3xl text-lg font-black shadow-xl">
+        {isEditing ? "Actualizar Ficha" : "Crear Usuario"}
       </Button>
     </form>
   );

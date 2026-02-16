@@ -3,7 +3,6 @@ import { useUserDetail, useUserGetters } from "../hooks/useUserGetters";
 import { useUserMutations } from "../hooks/useUserMutations";
 import { UserForm } from "../components/forms/UserForm";
 import { Button } from "../components/ui/Button";
-import { useAuth } from "../context/auth/useAuth";
 import { 
   User as UserIcon, Mail, Trash2, Edit3, 
   Plus, X, MapPin, GraduationCap 
@@ -12,19 +11,12 @@ import type { UserResponse, UserCreate, UserUpdate } from "../types/user.types";
 import type { UserFormData } from "../components/forms/UserForm";
 
 export const User = () => {
-  const { user: currentUser } = useAuth();
   const { users, isLoading: isLoadingList } = useUserGetters();
   const { createMutation, updateMutation, deleteMutation } = useUserMutations();
   
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  /**
-   * CORRECCIÓN CLAVE:
-   * El hook se declara una sola vez. 
-   * Si selectedUserId es null, no debería hacer nada (esto depende de cómo esté implementado useUserDetail, 
-   * usualmente se usa { enabled: !!selectedUserId } dentro del hook).
-   */
   const { data: detailedUser, isLoading: isLoadingDetail } = useUserDetail(selectedUserId || 0);
  
   const handleAction = async (data: UserFormData) => {
@@ -40,7 +32,7 @@ export const User = () => {
   };
 
   const openEdit = (user: UserResponse) => {
-    setSelectedUserId(user.id); // Esto dispara el fetch en useUserDetail automáticamente
+    setSelectedUserId(user.id);
     setIsModalOpen(true);
   };
 
@@ -89,7 +81,6 @@ export const User = () => {
                 </button>
               </div>
 
-              {/* Lógica de carga del detalle */}
               {selectedUserId && isLoadingDetail ? (
                 <div className="py-20 text-center">
                   <div className="w-10 h-10 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
@@ -100,7 +91,6 @@ export const User = () => {
                   onSubmit={handleAction}
                   isLoading={createMutation.isPending || updateMutation.isPending}
                   isEditing={!!selectedUserId}
-                  // defaultValues ahora viene con los datos "frescos" del GET detallado
                   defaultValues={detailedUser || undefined}
                 />
               )}
@@ -133,14 +123,22 @@ export const User = () => {
                 <MapPin size={16} className="text-slate-400 mt-1" />
                 <div>
                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Localización</p>
-                    <p className="text-sm text-slate-600 font-medium truncate w-40">{(u as any).address || "No registrada"}</p>
+                    <p className="text-sm text-slate-600 font-medium truncate w-40">
+                      {u.addresses && u.addresses.length > 0 
+                        ? `${u.addresses[0].street}, ${u.addresses[0].city}` 
+                        : "No registrada"}
+                    </p>
                 </div>
               </div>
               <div className="flex items-start gap-3">
                 <GraduationCap size={16} className="text-slate-400 mt-1" />
                 <div>
                     <p className="text-[10px] font-black uppercase text-slate-400 tracking-widest">Estudios</p>
-                    <p className="text-sm text-slate-600 font-medium truncate w-40">{(u as any).education || "Sin formación"}</p>
+                    <p className="text-sm text-slate-600 font-medium truncate w-40">
+                      {u.studies && u.studies.length > 0 
+                        ? (u.studies[0].degree || "Formación registrada")
+                        : "Sin formación"}
+                    </p>
                 </div>
               </div>
             </div>
