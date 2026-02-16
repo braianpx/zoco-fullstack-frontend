@@ -21,8 +21,6 @@ export const Address = () => {
   const [editingId, setEditingId] = useState<number | null>(null);
   const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
 
-  const displayUserName = addresses.length > 0 ? addresses[0].userName : ((user?.firstName+" "+user?.lastName) || "Usuario");
-
   const handleAction = async (data: AddressCreate, id?: number) => {
     try {
       setBackendErrors({});
