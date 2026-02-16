@@ -2,25 +2,51 @@
 import { type FC, useState } from "react";
 import { Sidebar } from "../components/Sidebar";
 import { useAuth } from "../context/auth/useAuth";
-import { Outlet } from "react-router-dom";
+import { Outlet, useNavigate } from "react-router-dom";
+import { SECTION_ROUTES, type DashboardSection } from "../utils/routes";
 
 export const Dashboard: FC = () => {
   const { role } = useAuth();
-  const [selectedSection, setSelectedSection] = useState<string>("Perfil");
+  const [selectedSection, setSelectedSection] = useState<DashboardSection>("Perfil");
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+
+  const handleSelectSection = (section: string) => {
+    if (section in SECTION_ROUTES) {
+      const sectionKey = section as DashboardSection;
+      setSelectedSection(sectionKey);
+      navigate(SECTION_ROUTES[sectionKey]);
+      setIsSidebarOpen(false); 
+    }
+  };
 
   return (
-    <div className="flex h-full bg-[#F9FAFB]">
-      {/* Sidebar */}
+    // h-[calc(100vh-84px)] asumiendo que tu Navbar mide 84px. 
+    // Ajusta el valor si la Navbar es más alta o baja.
+    <div className="flex h-[calc(100vh-10px)] w-full overflow-hidden bg-[#F9FAFB] relative">
+      
+      {/* Botón flotante para abrir el menú en Móvil */}
+      <button 
+        onClick={() => setIsSidebarOpen(true)}
+        className="lg:hidden fixed bottom-6 left-6 z-40 p-4 bg-[#6366F1] text-white rounded-full shadow-xl"
+      >
+        <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
+        </svg>
+      </button>
+
       <Sidebar
         role={role}
         selectedSection={selectedSection}
-        onSelectSection={setSelectedSection}
+        onSelectSection={handleSelectSection}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
       />
 
-      {/* Main Content */}
-      <div className="flex-1 bg-white shadow-inner rounded-l-2xl">
+      {/* El contenido principal nunca es cubierto por el Sidebar en LG */}
+      <main className="flex-1 bg-white lg:shadow-inner lg:rounded-tl-[2.5rem] overflow-y-auto p-4 mt-12 md:p-10 md:mt-6">
         <Outlet />
-      </div>
+      </main>
     </div>
   );
 };
