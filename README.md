@@ -1,73 +1,74 @@
-# React + TypeScript + Vite
+v# 💻 Frontend - Zoco User Management (React)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+Esta es la interfaz de usuario de la solución **Full Stack** para Zoco. Desarrollada como una Single Page Application (SPA) moderna, enfocada en la experiencia de usuario, la seguridad por roles y el diseño responsivo.
 
-Currently, two official plugins are available:
+---
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🛠️ Tecnologías y Librerías
+- **React 18 (TypeScript):** Para un desarrollo tipado y seguro.
+- **Vite:** Herramienta de construcción ultra rápida.
+- **Tailwind CSS:** Framework de estilos para un diseño moderno y Mobile-First.
+- **React Router DOM:** Gestión de navegación y protección de rutas.
+- **Context API:** Manejo del estado global de autenticación y sesión.
+- **Axios:** Cliente HTTP con interceptores para el manejo automático del token JWT.
+- **Lucide React:** Set de iconos minimalistas.
 
-## React Compiler
+---
 
-The React Compiler is currently not compatible with SWC. See [this issue](https://github.com/vitejs/vite-plugin-react/issues/428) for tracking the progress.
+## ✨ Funcionalidades del Frontend
 
-## Expanding the ESLint configuration
+### 🔐 Seguridad y Acceso
+- **Rutas Públicas/Privadas:** Control de acceso que impide a usuarios no logueados entrar al Dashboard.
+- **Gestión de Roles:** Interfaz dinámica que oculta o bloquea secciones de Administrador (como gestión de usuarios o logs) a usuarios normales.
+- **Persistence:** Almacenamiento seguro de la sesión para evitar cierres al refrescar la página.
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+### 📋 Interfaz de Usuario (UI)
+- **Dashboard Principal:** Panel con métricas y accesos directos según el perfil.
+- **Ficha de Usuario Pro:** Modal centrado de alta fidelidad que consolida:
+  - Edición de datos personales.
+  - Historial de Direcciones (Concatenado: Calle - Ciudad - País).
+  - Historial Académico (Título - Instituto - Fechas).
+  - Listado de **Session Logs** con estados visuales (Success/Failed).
+- **Diseño Responsivo:** Adaptación completa para móviles, tablets y pantallas de escritorio.
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+---
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## ⚙️ Requisitos Previos
+- **Node.js** v18.0 o superior.
+- **npm** o **yarn**.
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+---
+
+## 🚀 Instalación y Ejecución Local
+
+### 1. Instalación de dependencias
+Desde la raíz de la carpeta `frontend/Zoco.App`:
+```bash
+npm install
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+### 2. Configuración de Variables de Entorno
+Crea un archivo llamado `.env` en la raíz de la carpeta frontend y define la URL donde corre tu backend de .NET:
+`env`
+```bash
+VITE_API_URL=https://localhost:7054/api
 ```
+Usa el código con precaución.
+
+### 3. Ejecución en modo desarrollo
+```bash
+npm run dev
+
+```
+Usa el código con precaución.
+
+La aplicación estará disponible en `vhttp://localhost:5173v.
+📂 Estructura de Carpetas
+src/components: UI reutilizable (Inputs, Buttons, Modals, Forms).
+src/context: Lógica de autenticación y sesión global.
+src/hooks: Custom hooks para llamadas a la API y lógica de negocio.
+src/pages: Vistas principales (Login, Profile, Users, Dashboard).
+src/layouts: Componentes envolventes (MainLayout).
+src/types: Definiciones de interfaces de TypeScript para los modelos del sistema.
+Desarrollado por Braian - Full Stack Developer
