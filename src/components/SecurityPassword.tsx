@@ -1,8 +1,9 @@
 // src/components/profile/sections/SecuritySection.tsx
+import type { UserUpdate } from "../types/user.types";
 import { Input } from "./ui/Input";
 
 interface Props {
-  form: any;
+  form: UserUpdate & { confirmPassword?: string };
   errors: Record<string, string>;
   isPending: boolean;
   onChange: (key: string, value: string) => void;

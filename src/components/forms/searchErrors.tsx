@@ -1,9 +1,9 @@
 import type { UseMutationResult } from "@tanstack/react-query";
 
-export const searchErrors = (
+export const searchErrors = <TData, TError, TVariables, TContext>(
   errors: Record<string, string>, 
-  // Usamos "any" en los genéricos para que acepte cualquier respuesta/payload
-  registerMutation: UseMutationResult<any, any, any, any>
+  // Usamos genéricos propios de la función para reemplazar los 'any'
+  registerMutation: UseMutationResult<TData, TError, TVariables, TContext>
 ): boolean => {
   // 1. Unimos ambos objetos
   const allErrors = { ...errors };
@@ -13,6 +13,6 @@ export const searchErrors = (
     (msg) => typeof msg === "string" && msg.trim().length > 0
   );
 
-  // 3. registerMutation.isPending es la propiedad correcta para el estado de carga
+  // 3. Verificamos el estado de la mutación y los errores locales
   return registerMutation.isPending || hasMessages;
 };

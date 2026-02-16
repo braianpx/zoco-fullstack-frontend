@@ -3,7 +3,7 @@ import { Input } from "./ui/Input";
 import type { UserUpdate } from "../types/user.types";
 
 interface Props {
-  fields: any[];
+  fields: Array<{name: string, label:string, type:string, disabled?: boolean}>;
   form: UserUpdate;
   errors: Record<string, string>;
   isPending: boolean;

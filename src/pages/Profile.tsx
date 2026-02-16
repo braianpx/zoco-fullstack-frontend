@@ -9,10 +9,10 @@ import { useAuth } from "../context/auth/useAuth";
 
 export const Profile = () => {
   const { user } = useAuth();
-  const { getUser } = useUserGetters();
+  const { userQuery } = useUserGetters(user?.id as number);
   
   // Idealmente ID desde un AuthContext
-  const { data, isLoading, isError } = getUser(user?.id as number); 
+  const { data, isLoading, isError } = userQuery; 
 
   if (isLoading) return <LoadingSkeleton messageLoading="Cargando perfil..." />;
 

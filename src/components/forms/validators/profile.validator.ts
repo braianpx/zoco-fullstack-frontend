@@ -1,7 +1,8 @@
 // src/components/profile/validators/profile.validator.ts
 
-export const validateProfileField = (key: string, value: string, form: any) => {
-  // Validaciones comunes (Nombre, Apellido, Email)
+export type ProfileFormType = Record<string, unknown>;
+
+export const validateProfileField = (key: string, value: string, form: ProfileFormType): string => {
   if (key === "firstName" || key === "lastName") {
     if (!value.trim()) return "Campo obligatorio";
     if (/\d/.test(value)) return "No puede contener números";
@@ -13,25 +14,25 @@ export const validateProfileField = (key: string, value: string, form: any) => {
     return !emailRegex.test(value) ? "Email inválido" : "";
   }
 
-  // VALIDACIÓN CLAVE: Contraseña opcional en Perfil
   if (key === "password") {
-    if (!value) return ""; // Si está vacío, no hay error (es opcional)
+    if (!value) return ""; 
     return value.length < 6 ? "Mínimo 6 caracteres" : "";
   }
 
   if (key === "confirmPassword") {
-    if (!form.password) return ""; // Si no hay password, no validamos confirmación
-    return value !== form.password ? "Las contraseñas no coinciden" : "";
+    const password = String(form.password ?? "");
+    if (!password) return ""; 
+    return value !== password ? "Las contraseñas no coinciden" : "";
   }
 
   return "";
 };
 
-export const validateProfileForm = (form: any) => {
+export const validateProfileForm = (form: ProfileFormType) => {
   const errors: Record<string, string> = {};
-  // Solo validamos los campos que existen en el form
   Object.keys(form).forEach((key) => {
-    const error = validateProfileField(key, form[key], form);
+    const value = String(form[key] || "");
+    const error = validateProfileField(key, value, form);
     if (error) errors[key] = error;
   });
   return errors;

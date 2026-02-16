@@ -1,9 +1,9 @@
-import { QueryClient, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { register, updateUser } from "../api/user.api";
 import { useNotification } from "../context/notification/useNotification";
 import type { AxiosError } from "axios";
 import type { ApiResponse } from "../types/apiResponse.types";
-import type { UserResponse, UserUpdate } from "../types/user.types";
+import type { UserUpdate } from "../types/user.types";
 
 export const useUserMutations = () => {
 
