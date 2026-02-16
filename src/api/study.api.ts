@@ -3,7 +3,6 @@ import type { StudyCreate, StudyResponse, StudyUpdate } from "../types/study.typ
 import { api } from "./axios";
 
 export const createStudy = async (data: StudyCreate) => {
-  data.endDate = null
   const res = await api.post<ApiResponse<StudyResponse>>("studies", data);
   return res.data;
 };

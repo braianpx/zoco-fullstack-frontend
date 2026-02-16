@@ -9,6 +9,7 @@ import { Study } from "./pages/Study"; // 1. Importamos la página de estudios
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import { PublicRoute } from "./components/routing/PublicRoute";
 import { useAuth } from "./context/auth/useAuth"; // 2. Importamos tu hook de auth para obtener el rol/id
+import { SessionLog } from "./pages/SessionLog";
 
 function App() {
   const { user } = useAuth(); // Obtenemos el usuario logueado
@@ -31,7 +32,7 @@ function App() {
           >
             <Route path="profile" element={<Profile />} />
             <Route path="addresses" element={<Address />} /> 
-            
+            <Route path="logs" element={<SessionLog />} />
             {/* 3. Añadimos la ruta para estudios pasando las props necesarias */}
             <Route 
               path="studies" 

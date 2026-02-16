@@ -5,3 +5,12 @@ export interface SessionLogResponse {
     startDate: Date;   
     endDate?: Date;    
 }
+
+export interface SessionLogCreate {
+    userId: number;
+    startDate: Date;
+}
+
+export interface SessionLogUpdate {
+    endDate: Date;
+}
