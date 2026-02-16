@@ -4,11 +4,15 @@ import { MainLayout } from "./layouts/MainLayout";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Profile } from "./pages/Profile";
-import { Address } from "./pages/Address"; // 1. Importamos la nueva página
+import { Address } from "./pages/Address"; 
+import { Study } from "./pages/Study"; // 1. Importamos la página de estudios
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import { PublicRoute } from "./components/routing/PublicRoute";
+import { useAuth } from "./context/auth/useAuth"; // 2. Importamos tu hook de auth para obtener el rol/id
 
 function App() {
+  const { user } = useAuth(); // Obtenemos el usuario logueado
+
   return (
     <BrowserRouter>
       <Routes>
@@ -25,9 +29,20 @@ function App() {
               </ProtectedRoute>
             }
           >
-            {/* 2. Añadimos la ruta hija para direcciones */}
             <Route path="profile" element={<Profile />} />
             <Route path="addresses" element={<Address />} /> 
+            
+            {/* 3. Añadimos la ruta para estudios pasando las props necesarias */}
+            <Route 
+              path="studies" 
+              element={
+                <Study 
+                  userId={user?.id ?? null} 
+                  isAdmin={user?.roleName === "Admin"} 
+                />
+              } 
+            />
+            
             {/* <Route path="users" element={<Users />} /> */}
           </Route>
         </Route>
