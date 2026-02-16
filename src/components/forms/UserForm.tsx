@@ -83,52 +83,52 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
         </div>
       </div>
 
-      {/* 4. SESSION LOGS (CORREGIDO PARA EVITAR ERROR TS2339) */}
-      <div className="bg-slate-900 rounded-4xl p-6 text-white">
-        <div className="flex items-center gap-2 mb-4 text-indigo-300">
-          <History size={16} />
-          <span className="text-[10px] font-black uppercase tracking-widest">Historial de Sesiones</span>
-        </div>
-        
-        <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar-dark">
-          {defaultValues?.sessionLogs && defaultValues.sessionLogs.length > 0 ? (
-            // Convertimos a any[] para que TS no valide 'loginTime' o 'status' contra SessionLogResponse
-            ([...defaultValues.sessionLogs] as any[])
-              .sort((a, b) => {
-                const dateA = new Date(a.loginTime || a.startDate || a.loginDate || "").getTime();
-                const dateB = new Date(b.loginTime || b.startDate || b.loginDate || "").getTime();
-                return dateB - dateA;
-              })
-              .map((log, i) => {
-                const dateObj = new Date(log.loginTime || log.startDate || log.loginDate || "");
-                const displayDate = !isNaN(dateObj.getTime()) 
-                  ? `${dateObj.toLocaleDateString('es-AR')} - ${dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
-                  : "Fecha no disponible";
+            {/* 4. SESSION LOGS (TIPADO SEGURO PARA DEPLOY) */}
+          <div className="bg-slate-900 rounded-4xl p-6 text-white">
+            <div className="flex items-center gap-2 mb-4 text-indigo-300">
+              <History size={16} />
+              <span className="text-[10px] font-black uppercase tracking-widest">Historial de Sesiones</span>
+            </div>
+            
+            <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar-dark">
+              {defaultValues?.sessionLogs && defaultValues.sessionLogs.length > 0 ? (
+                // Forzamos el array a Record para que acepte cualquier string como propiedad
+                (defaultValues.sessionLogs as Record<string, any>[])
+                  .sort((a, b) => {
+                    const dateA = new Date(a.loginTime || a.startDate || "").getTime();
+                    const dateB = new Date(b.loginTime || b.startDate || "").getTime();
+                    return dateB - dateA;
+                  })
+                  .map((log, i) => {
+                    const dateObj = new Date(log.loginTime || log.startDate || "");
+                    const displayDate = !isNaN(dateObj.getTime()) 
+                      ? `${dateObj.toLocaleDateString('es-AR')} - ${dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
+                      : "Fecha no disponible";
 
-                return (
-                  <div key={i} className="flex justify-between items-center text-[10px] bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-                    <div className="flex items-center gap-2">
-                      <Calendar size={12} className="text-indigo-400" />
-                      <span className="font-mono text-slate-300">{displayDate}</span>
-                    </div>
-                    <span className={`px-2 py-0.5 rounded-md font-black uppercase ${
-                      log.status === 'Success' || log.isSuccess === true ? 'text-emerald-400' : 'text-rose-400'
-                    }`}>
-                      {log.status || (log.isSuccess ? 'Success' : 'Failed')}
-                    </span>
-                  </div>
-                );
-              })
-          ) : (
-            <p className="text-xs text-slate-500 italic">No hay registros de sesión.</p>
-          )}
-        </div>
-      </div>
+                    return (
+                      <div key={i} className="flex justify-between items-center text-[10px] bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                        <div className="flex items-center gap-2">
+                          <Calendar size={12} className="text-indigo-400" />
+                          <span className="font-mono text-slate-300">{displayDate}</span>
+                        </div>
+                        <span className={`px-2 py-0.5 rounded-md font-black uppercase ${
+                          log.status === 'Success' || log.isSuccess === true ? 'text-emerald-400' : 'text-rose-400'
+                        }`}>
+                          {log.status || (log.isSuccess ? 'Success' : 'Failed')}
+                        </span>
+                      </div>
+                    );
+                  })
+              ) : (
+                <p className="text-xs text-slate-500 italic">No hay registros de sesión.</p>
+              )}
+            </div>
+          </div>
 
-      {/* CORRECCIÓN: Si tu componente Button no acepta 'isLoading', quítalo o agrégalo a sus Props */}
-      <Button type="submit" className="w-full py-4 rounded-3xl text-lg font-black shadow-xl">
-        {isLoading ? "Procesando..." : (isEditing ? "Actualizar Ficha" : "Crear Usuario")}
-      </Button>
+          {/* CORRECCIÓN BOTÓN: Se eliminó la prop 'isLoading' que causaba el error TS2322 */}
+          <Button type="submit" className="w-full py-4 rounded-3xl text-lg font-black shadow-xl">
+            {isLoading ? "Procesando..." : (isEditing ? "Actualizar Ficha" : "Crear Usuario")}
+          </Button>
     </form>
   );
 };
