@@ -4,24 +4,31 @@ import type { UserResponse } from "../../types/user.types";
 import type { Role } from "../../types/auth.types";
 
 export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
+  // 1. Centralizamos el usuario (el role ya debería venir dentro o guardarse junto)
   const [user, setUser] = useState<UserResponse | null>(() => {
     const storedUser = sessionStorage.getItem("user");
     return storedUser ? JSON.parse(storedUser) : null;
   });
 
-  const token = sessionStorage.getItem("token");
+  // 2. El token lo manejamos en estado para que el useMemo reaccione al cambio
+  const [token, setToken] = useState<string | null>(() => {
+    return sessionStorage.getItem("token");
+  });
 
-  const login = (token: string, user: UserResponse, role: Role) => {
-    sessionStorage.setItem("token", token);
-    sessionStorage.setItem("user", JSON.stringify(user));
-    sessionStorage.setItem("role", JSON.stringify(role));
-    setUser({...user, roleName: role});
+  const login = (newToken: string, userData: UserResponse, role: Role) => {
+    // Sincronizamos el rol dentro del objeto usuario para tener una sola fuente de verdad
+    const userWithRole = { ...userData, roleName: role };
+
+    sessionStorage.setItem("token", newToken);
+    sessionStorage.setItem("user", JSON.stringify(userWithRole));
+    
+    setToken(newToken);
+    setUser(userWithRole);
   };
 
   const logout = () => {
-    sessionStorage.removeItem("token");
-    sessionStorage.removeItem("user");
-    sessionStorage.removeItem("role");
+    sessionStorage.clear(); // Más limpio que remover uno por uno
+    setToken(null);
     setUser(null);
   };
 
@@ -32,9 +39,12 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       isAuthenticated: !!token,
       login,
       logout,
+      // Forzamos el tipo Role para que coincida con AuthContextType
+      role: (user?.roleName || "User") as Role, 
     }),
     [user, token]
   );
+
 
   return (
     <AuthContext.Provider value={value}>
@@ -42,4 +52,3 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     </AuthContext.Provider>
   );
 };
-

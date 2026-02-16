@@ -8,6 +8,7 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string, user: UserResponse, role: Role) => void;
   logout: () => void;
+  role: Role;
 }
 
 export const AuthContext = createContext<AuthContextType>(
