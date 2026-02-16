@@ -10,13 +10,11 @@ export const AuthPanel: FC = () => {
   };
 
   return (
-    <div className="w-full max-w-md bg-white border border-[#E5E7EB] rounded-2xl shadow-sm p-8 transition-all duration-300">
-      
+    <div className="w-full max-w-md h-fit bg-white border border-[#E5E7EB] rounded-2xl shadow-sm p-8 transition-all duration-500 ease-in-out">
       <div className="mb-6 text-center">
-        <h2 className="text-4xl font-bold text-[#111827]">
+        <h2 className="text-3xl font-bold text-[#111827]">
           {isLogin ? "Bienvenido" : "Crear cuenta"}
         </h2>
-
         <p className="text-sm text-[#6B7280] mt-1">
           {isLogin
             ? "Ingresa tus credenciales para continuar"
@@ -24,7 +22,7 @@ export const AuthPanel: FC = () => {
         </p>
       </div>
 
-      {isLogin ? <LoginForm /> : <RegisterForm />}
+        {isLogin ? <LoginForm /> : <RegisterForm />}
 
       <div className="mt-6 text-center text-sm text-[#6B7280]">
         <span>

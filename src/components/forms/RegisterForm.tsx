@@ -2,9 +2,10 @@ import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { useUserMutations } from "../../hooks/useUserMutations";
-import { validateRegisterField, validateRegisterForm } from "./user.validator";
+import { validateRegisterField, validateRegisterForm } from "./validators/user.validator";
 import { mapErrors } from "./mapErrors";
 import { searchErrors } from "./searchErrors";
+import { FormErrorList } from "../ui/FormErrorList";
 
 // Configuración para iterar los campos
 const FIELDS = [
@@ -43,13 +44,16 @@ export const RegisterForm = () => {
     }
 
     try {
+
       await registerMutation.mutateAsync(form);
-      // Reset si sale bien
-      setForm({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
-      setErrors({});
+      
     } catch (err) {
         const newErrors = mapErrors(err); // Ahora newErrors es un Record<string, string>
         setSubmitErrors(newErrors); // ¡Funciona!
+      } finally {
+        setForm({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
+        setErrors({});
+        setSubmitErrors({});
       }
     };
 
@@ -66,20 +70,9 @@ export const RegisterForm = () => {
         />
       ))}
 
-      {/* SECCIÓN DE ERRORES: Muestra todos los errores del objeto uno tras otro */}
-      {Object.keys(submitErrors).length > 0 && (
-        <div className="flex flex-col gap-1 mt-2">
-          {Object.entries(submitErrors).map(([key, message]) => (
-            message && (
-              <span key={key} className="text-red-500 text-sm font-medium">
-                • {message}
-              </span>
-            )
-          ))}
-        </div>
-      )}
+      <FormErrorList errors={submitErrors}/>
 
-      <Button type="submit" disabled={searchErrors(errors, submitErrors, registerMutation)} className="mt-2">
+      <Button type="submit" disabled={searchErrors(errors, registerMutation)} className="mt-2">
         {registerMutation.isPending ? "Creando cuenta..." : "Registrarse"}
       </Button>
     </form>

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { useAuthMutations } from "../../hooks/useAuthMutations";
-import { validateRegisterField } from "./user.validator"; 
+import { validateRegisterField } from "./validators/user.validator"; 
 import { mapErrors } from "./mapErrors";
 import { searchErrors } from "./searchErrors";
 
@@ -67,7 +67,7 @@ export const LoginForm = () => {
       <Button 
         type="submit" 
         // Usamos tu función searchErrors
-        disabled={searchErrors(errors, submitErrors, loginMutation)}
+        disabled={searchErrors(errors, loginMutation)}
       >
         {loginMutation.isPending ? "Iniciando..." : "Ingresar"}
       </Button>

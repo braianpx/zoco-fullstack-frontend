@@ -4,15 +4,16 @@ import { HomeShowcase } from "../components/HomeShowcase";
 
 export const Home: FC = () => {
   return (
-    <div className="h-full w-full bg-[#F9FAFB] flex">
+    // flex-1 hace que ocupe todo el espacio bajo la navbar
+    <div className="w-full h-full flex flex-col lg:flex-row">
       
-      {/* Left UX / Branding */}
-      <div className="hidden lg:flex w-1/2 h-full relative overflow-hidden">
+      {/* Lado Izquierdo - Branding */}
+      <div className="hidden h-[98vh] lg:flex lg:w-1/2 bg-[#EEF2FF] relative overflow-hidden">
         <HomeShowcase />
       </div>
 
-      {/* Right Forms */}
-      <div className="w-full lg:w-1/2 flex items-center justify-center px-6">
+      {/* Lado Derecho - Formulario */}
+      <div className="w-full h-max-full lg:w-1/2 flex items-center justify-center p-6 md:pt-12 lg:pt-18">
         <AuthPanel />
       </div>
     </div>
