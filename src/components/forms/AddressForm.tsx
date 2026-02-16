@@ -40,15 +40,18 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
   return (
     <form 
       onSubmit={handleLocalSubmit} 
-      // Agregamos w-full y max-w-2xl para que ocupe buen espacio pero no se deforme
-      className="w-full max-w-2xl mx-auto p-2 sm:p-4 bg-white rounded-3xl border border-slate-100 shadow-xl shadow-slate-200/50 space-y-6 animate-in fade-in zoom-in-95 duration-500"
+      className="w-full max-w-2xl mx-auto p-6 sm:p-8 bg-white rounded-[2rem] border border-slate-200 shadow-2xl shadow-slate-200/50 space-y-8 animate-in fade-in zoom-in-95 duration-500"
     >
-      <div className="space-y-1 mb-4">
-        <h3 className="text-xl font-bold text-slate-800">Detalles de la ubicación</h3>
-        <p className="text-sm text-slate-500">Ingresa la dirección exacta para tus entregas.</p>
+      {/* Header simplificado sin paquetes externos */}
+      <div className="border-b border-slate-50 pb-6">
+        <div className="inline-block px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full mb-3">
+          <span className="text-[10px] font-bold uppercase tracking-widest">Direccion</span>
+        </div>
+        <h3 className="text-2xl font-bold text-slate-900 tracking-tight">Detalles de la ubicación</h3>
+        <p className="text-sm text-slate-500 mt-1">Ingresa la dirección exacta.</p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-5">
         <div className="col-span-full">
           <Input 
             label="Calle y Número"
@@ -56,6 +59,7 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
             value={form.street}
             error={allErrors.street}
             onChange={(e) => handleChange("street", e.target.value)}
+            className="bg-slate-50/30 focus:bg-white"
           />
         </div>
         
@@ -65,6 +69,7 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
           value={form.city}
           error={allErrors.city}
           onChange={(e) => handleChange("city", e.target.value)}
+          className="bg-slate-50/30 focus:bg-white"
         />
 
         <Input 
@@ -73,6 +78,7 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
           value={form.country}
           error={allErrors.country}
           onChange={(e) => handleChange("country", e.target.value)}
+          className="bg-slate-50/30 focus:bg-white"
         />
 
         <div className="col-span-full sm:col-span-1">
@@ -82,19 +88,25 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
             value={form.postalCode || ""}
             error={allErrors.postalCode}
             onChange={(e) => handleChange("postalCode", e.target.value)}
+            className="bg-slate-50/30 focus:bg-white"
           />
         </div>
       </div>
 
-      <FormErrorList errors={externalErrors || {}} />
+      {Object.keys(externalErrors || {}).length > 0 && (
+        <div className="p-4 bg-red-50 rounded-2xl">
+          <FormErrorList errors={externalErrors || {}} />
+        </div>
+      )}
 
-      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-6 border-t border-slate-50">
+      {/* Footer con botones alineados al estilo de Estudios */}
+      <div className="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4">
         <Button 
           type="button" 
-          variant="secondary" 
+          variant="ghost" 
           onClick={onCancel} 
           disabled={isPending}
-          className="hover:bg-slate-100 transition-colors"
+          className="w-full sm:w-auto"
         >
           Cancelar
         </Button>
@@ -102,9 +114,9 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
           type="submit" 
           variant="primary" 
           disabled={isPending}
-          className="px-8 shadow-lg shadow-indigo-200 active:scale-95 transition-all"
+          className="w-full sm:w-auto min-w-[160px] py-4 shadow-lg shadow-indigo-100"
         >
-          {isPending ? "Guardando..." : "Confirmar Dirección"}
+          {isPending ? "Guardando..." : "Guardar Dirección"}
         </Button>
       </div>
     </form>
