@@ -13,7 +13,7 @@ export const Home: FC = () => {
       </div>
 
       {/* Lado Derecho - Formulario */}
-      <div className="w-full h-max-full lg:w-1/2 flex items-center justify-center p-6 md:pt-12 lg:pt-18">
+      <div className="w-full h-max-full lg:w-1/2 flex items-center justify-center p-6 mt-12 md:pt-12 lg:pt-8">
         <AuthPanel />
       </div>
     </div>

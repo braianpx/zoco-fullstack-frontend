@@ -44,9 +44,9 @@ export const Dashboard: FC = () => {
       />
 
       {/* El contenido principal nunca es cubierto por el Sidebar en LG */}
-      <main className="flex-1 bg-white lg:shadow-inner lg:rounded-tl-[2.5rem] overflow-y-auto p-4 mt-12 md:p-10 md:mt-6">
-        <Outlet />
-      </main>
+    <main className="flex-1 bg-white lg:shadow-inner lg:rounded-tl-[2.5rem] overflow-y-auto scroll-smooth p-4 mt-12 md:p-10 md:mt-6">
+      <Outlet />
+    </main>
     </div>
   );
 };

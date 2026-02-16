@@ -4,6 +4,7 @@ import { MainLayout } from "./layouts/MainLayout";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Profile } from "./pages/Profile";
+import { Address } from "./pages/Address"; // 1. Importamos la nueva página
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import { PublicRoute } from "./components/routing/PublicRoute";
 
@@ -24,7 +25,9 @@ function App() {
               </ProtectedRoute>
             }
           >
+            {/* 2. Añadimos la ruta hija para direcciones */}
             <Route path="profile" element={<Profile />} />
+            <Route path="addresses" element={<Address />} /> 
             {/* <Route path="users" element={<Users />} /> */}
           </Route>
         </Route>

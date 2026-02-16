@@ -9,7 +9,7 @@ interface Props extends ButtonHTMLAttributes<HTMLButtonElement> {
 export const Button = ({ children, variant = "primary", className = "", ...props }: Props) => {
   
   // Estilos base compartidos
-  const baseStyles = "w-full py-2.5 rounded-lg text-sm font-medium transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2";
+  const baseStyles = "py-2.5 rounded-lg text-sm font-medium transition-all active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2";
   
   // Estilos específicos por variante
   const variants = {
