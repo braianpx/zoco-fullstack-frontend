@@ -7,3 +7,18 @@ export interface AddressResponse {
   userId: number
   userName?: string
 }
+
+export interface AddressCreate {
+  street: string;
+  city: string;
+  country: string;
+  postalCode?: string | null;
+}
+
+export interface AddressUpdate {
+  street: string;
+  city: string;
+  country: string;
+  postalCode?: string | null;
+}
+
