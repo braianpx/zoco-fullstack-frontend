@@ -22,7 +22,6 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
   const { user: currentUser } = useAuth();
   const isAdmin = currentUser?.roleName === "Admin";
   
-  // Al pasar <UserFormData>, getValues() ya devuelve el tipo correcto sin necesidad de "as any"
   const { register, handleSubmit, getValues, formState: { errors } } = useForm<UserFormData>({ defaultValues });
 
   return (
@@ -38,7 +37,10 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
           <Input label="Email Institucional" error={errors.email?.message} {...register("email", { validate: (v) => validateUserField("email", v || "", getValues()) || true })} />
         </div>
         <div>
-          <label className="block text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1 flex items-center gap-1"><Shield size={12}/> Rol</label>
+          {/* CORRECCIÓN: Se eliminó 'block' porque chocaba con 'flex' */}
+          <label className="text-[10px] font-black text-slate-400 uppercase mb-1.5 ml-1 flex items-center gap-1">
+            <Shield size={12}/> Rol
+          </label>
           <select disabled={!isAdmin} {...register("roleName")} className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-4 py-2.5 text-sm font-bold text-slate-700 outline-none">
             <option value="User">User</option>
             <option value="Admin">Admin</option>
@@ -81,7 +83,7 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
         </div>
       </div>
 
-      {/* 4. SESSION LOGS */}
+      {/* 4. SESSION LOGS (CORREGIDO PARA EVITAR ERROR TS2339) */}
       <div className="bg-slate-900 rounded-4xl p-6 text-white">
         <div className="flex items-center gap-2 mb-4 text-indigo-300">
           <History size={16} />
@@ -90,14 +92,15 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
         
         <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar-dark">
           {defaultValues?.sessionLogs && defaultValues.sessionLogs.length > 0 ? (
-            [...defaultValues.sessionLogs]
+            // Convertimos a any[] para que TS no valide 'loginTime' o 'status' contra SessionLogResponse
+            ([...defaultValues.sessionLogs] as any[])
               .sort((a, b) => {
-                const dateA = new Date(a.loginTime || "").getTime();
-                const dateB = new Date(b.loginTime || "").getTime();
+                const dateA = new Date(a.loginTime || a.startDate || a.loginDate || "").getTime();
+                const dateB = new Date(b.loginTime || b.startDate || b.loginDate || "").getTime();
                 return dateB - dateA;
               })
               .map((log, i) => {
-                const dateObj = new Date(log.loginTime || "");
+                const dateObj = new Date(log.loginTime || log.startDate || log.loginDate || "");
                 const displayDate = !isNaN(dateObj.getTime()) 
                   ? `${dateObj.toLocaleDateString('es-AR')} - ${dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
                   : "Fecha no disponible";
@@ -108,8 +111,10 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
                       <Calendar size={12} className="text-indigo-400" />
                       <span className="font-mono text-slate-300">{displayDate}</span>
                     </div>
-                    <span className={`px-2 py-0.5 rounded-md font-black uppercase ${log.status === 'Success' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                      {log.status || 'Active'}
+                    <span className={`px-2 py-0.5 rounded-md font-black uppercase ${
+                      log.status === 'Success' || log.isSuccess === true ? 'text-emerald-400' : 'text-rose-400'
+                    }`}>
+                      {log.status || (log.isSuccess ? 'Success' : 'Failed')}
                     </span>
                   </div>
                 );
@@ -120,8 +125,9 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
         </div>
       </div>
 
-      <Button type="submit" isLoading={isLoading} className="w-full py-4 rounded-3xl text-lg font-black shadow-xl">
-        {isEditing ? "Actualizar Ficha" : "Crear Usuario"}
+      {/* CORRECCIÓN: Si tu componente Button no acepta 'isLoading', quítalo o agrégalo a sus Props */}
+      <Button type="submit" className="w-full py-4 rounded-3xl text-lg font-black shadow-xl">
+        {isLoading ? "Procesando..." : (isEditing ? "Actualizar Ficha" : "Crear Usuario")}
       </Button>
     </form>
   );
