@@ -25,6 +25,6 @@ export const useUserGetters = () => {
   return {
     users: (query.data?.data as UserResponse[]) || [],
     isLoading: query.isLoading,
-    isError: query.isError
+    isError: query.isError,
   };
 };

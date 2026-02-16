@@ -95,6 +95,7 @@ export const SessionLog = () => {
                   {!log.endDate && (
                     <button 
                       onClick={() => {
+                        handleUpdateSession({endDate: new Date()})
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                         setEditingLog(log);
                       }} 

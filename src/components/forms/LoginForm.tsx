@@ -9,10 +9,19 @@ import { mapErrors } from "./mapErrors";
 import { searchErrors } from "./searchErrors";
 
 const FIELDS = [
-  { name: "email", label: "Email", type: "email" },
-  { name: "password", label: "Contraseña", type: "password" },
+  { 
+    name: "email", 
+    label: "Correo Electrónico", 
+    type: "email", 
+    placeholder: "ejemplo@correo.com" 
+  },
+  { 
+    name: "password", 
+    label: "Contraseña", 
+    type: "password", 
+    placeholder: "••••••••" 
+  },
 ] as const;
-
 export const LoginForm = () => {
   const { loginMutation } = useAuthMutations();
 
@@ -49,6 +58,7 @@ export const LoginForm = () => {
           key={f.name}
           label={f.label}
           type={f.type}
+          placeholder={f.placeholder} // <-- Agregamos esta línea
           value={form[f.name]}
           error={errors[f.name] || submitErrors[f.name]}
           onChange={(e) => handleChange(f.name, e.target.value)}

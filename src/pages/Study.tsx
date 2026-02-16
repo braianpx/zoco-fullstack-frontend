@@ -39,10 +39,6 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
       {/* Header */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-100 pb-8 gap-6">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 text-indigo-600 rounded-full mb-3 border border-indigo-100">
-            <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse"></div>
-            <span className="text-xs font-bold uppercase tracking-[0.15em]">{displayUserName}</span>
-          </div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Estudios</h1>
           <p className="text-slate-500 mt-1">Tu trayectoria académica y formación profesional.</p>
         </div>
