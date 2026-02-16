@@ -1,10 +1,37 @@
-import './App.css'
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { MainLayout } from "./layouts/MainLayout";
+import { Home } from "./pages/Home";
+import { PublicRoute } from "./components/routing/PublicRoute";
+import { Dashboard } from "./pages/Dashboard";
+// import { Users } from "./pages/Users";
+// import { Profile } from "./pages/Profile";
+import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 
 function App() {
-  return(
-    <div className="min-h-screen bg-blue-500 flex items-center justify-center border-2 border-red">
-      <h1 className="text-white text-4xl font-bold">Tailwind funciona!</h1>
-    </div>
-  )
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route element={<MainLayout />}>
+          <Route
+            path="/"
+            element={
+              <PublicRoute>
+                <Home />
+              </PublicRoute>
+            }
+          />
+          <Route
+            path="/dashboard"
+            element={
+              <ProtectedRoute>
+                <Dashboard />
+              </ProtectedRoute>
+            }
+          />
+        </Route> 
+      </Routes>
+    </BrowserRouter>
+  );
 }
-export default App
+
+export default App;
