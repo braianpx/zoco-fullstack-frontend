@@ -1,5 +1,5 @@
 import type { FC } from "react";
-import { Link, NavLink } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/auth/useAuth";
 import { UserMenu } from "./UserMenu";
 
