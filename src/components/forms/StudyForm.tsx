@@ -13,7 +13,8 @@ interface Props {
 }
 
 export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing }: Props) => {
-  const { register, handleSubmit, watch, reset, formState: { errors } } = useForm<StudyCreate>({
+  // Reemplazamos 'watch' por 'getValues'
+  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<StudyCreate>({
     defaultValues
   });
 
@@ -21,7 +22,6 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing }: Pro
     if (defaultValues) reset(defaultValues);
   }, [defaultValues, reset]);
 
-  const formValues = watch();
   const userName = defaultValues?.userName;
 
   return (
@@ -42,14 +42,18 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing }: Pro
         label="Título / Carrera"
         placeholder="Ej. Licenciatura en Sistemas"
         error={errors.degree?.message}
-        {...register("degree", { validate: (v) => validateStudyField("degree", v) || true })} 
+        {...register("degree", { 
+          validate: (v) => validateStudyField("degree", v) || true 
+        })} 
       />
 
       <Input 
         label="Institución"
         placeholder="Ej. Universidad Tecnológica Nacional"
         error={errors.institution?.message}
-        {...register("institution", { validate: (v) => validateStudyField("institution", v) || true })} 
+        {...register("institution", { 
+          validate: (v) => validateStudyField("institution", v) || true 
+        })} 
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -57,13 +61,18 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing }: Pro
           label="Fecha de Inicio"
           type="date"
           error={errors.startDate?.message}
-          {...register("startDate", { validate: (v) => validateStudyField("startDate", v) || true })} 
+          {...register("startDate", { 
+            validate: (v) => validateStudyField("startDate", v) || true 
+          })} 
         />
         <Input 
           label="Fecha de Fin"
           type="date"
           error={errors.endDate?.message}
-          {...register("endDate", { validate: (v) => validateStudyField("endDate", v, formValues) || true })} 
+          {...register("endDate", { 
+            // Inyectamos getValues() directamente para comparar las fechas sin causar re-renders
+            validate: (v) => validateStudyField("endDate", v, getValues()) || true 
+          })} 
         />
       </div>
 

@@ -1,3 +1,4 @@
+// src/components/profile/ProfileForm.tsx
 import { useState, useMemo } from "react";
 import { Button } from "../ui/Button";
 import { FormErrorList } from "../ui/FormErrorList";
@@ -6,14 +7,15 @@ import { SecurityPassword } from "../SecurityPassword";
 import { useUserMutations } from "../../hooks/useUserMutations";
 import { useAuth } from "../../context/auth/useAuth";
 import { validateProfileForm, type ProfileFormType } from "./validators/profile.validator";
-import { validateRegisterField, type RegisterForm } from "./validators/user.validator";
+import { validateUserField, type UserFormType } from "./validators/user.validator";
 import { mapErrors } from "./mapErrors";
 import { searchErrors } from "./searchErrors";
 import type { UserResponse, UserUpdate } from "../../types/user.types";
 
 export const ProfileForm = ({ user }: { user: UserResponse }) => {
   const { role } = useAuth();
-  const { updateUserMutation } = useUserMutations();
+  const { updateMutation } = useUserMutations();
+  const isPending = updateMutation.isPending;
 
   const fields = useMemo(() => [
     { name: "firstName", label: "Nombre", type: "text" },
@@ -37,7 +39,7 @@ export const ProfileForm = ({ user }: { user: UserResponse }) => {
   const handleChange = (key: string, value: string) => {
     const newForm = { ...form, [key]: value };
     setForm(newForm);
-    const error = validateRegisterField(key, value, newForm as unknown as RegisterForm);
+    const error = validateUserField(key, value, newForm as unknown as UserFormType);
     setErrors(prev => ({ ...prev, [key]: error }));
   };
 
@@ -53,15 +55,21 @@ export const ProfileForm = ({ user }: { user: UserResponse }) => {
     if (Object.keys(localErrors).length > 0) return setErrors(localErrors);
 
     try {
-      // 2. Quitamos la extracción de confirmPassword si no la usas, 
-      // o simplemente usa el operador rest omitiendo la propiedad.
+      // CORRECCIÓN: Usamos "_confirmPassword" (o "confirmPassword: _") para que el linter ignore la variable no usada
       const { ...dataToSubmit } = form;
       
-      if (!dataToSubmit.password) delete dataToSubmit.password;
+      if (!dataToSubmit.password) {
+        delete dataToSubmit.password;
+      }
       
-      await updateUserMutation.mutateAsync({ data: dataToSubmit, userId: user.id });
+      await updateMutation.mutateAsync({ 
+        data: dataToSubmit as UserUpdate, 
+        userId: user.id 
+      });
+
       setSubmitErrors({});
       setForm(prev => ({ ...prev, password: "", confirmPassword: "" }));
+      alert("Perfil actualizado correctamente");
     } catch (err) {
       setSubmitErrors(mapErrors(err));
     }
@@ -81,32 +89,28 @@ export const ProfileForm = ({ user }: { user: UserResponse }) => {
   };
 
   const isDirty = useMemo(() => {
-    const isInfoChanged = 
-      form.firstName !== user.firstName ||
-      form.lastName !== user.lastName ||
-      form.email !== user.email ||
-      (form.roleName !== (user.roleName || ""));
-
-    const isPasswordChanged = !!form.password && form.password.length > 0;
-
-    return isInfoChanged || isPasswordChanged;
+    return form.firstName !== user.firstName ||
+           form.lastName !== user.lastName ||
+           form.email !== user.email ||
+           form.roleName !== (user.roleName || "") ||
+           (!!form.password && form.password.length > 0);
   }, [form, user]);
 
   return (
-     <form onSubmit={handleSubmit} className="bg-white p-8 rounded-2xl border border-slate-100 shadow-sm space-y-8 animate-in fade-in duration-500">
+     <form onSubmit={handleSubmit} className="bg-white p-8 rounded-4xl border border-slate-100 shadow-sm space-y-8 animate-in fade-in duration-500">
       
       <PersonalInfoSection 
         fields={fields} 
         form={form} 
         errors={errors} 
-        isPending={updateUserMutation.isPending} 
+        isPending={isPending} 
         onChange={handleChange} 
       />
 
       <SecurityPassword 
         form={form} 
         errors={errors} 
-        isPending={updateUserMutation.isPending} 
+        isPending={isPending} 
         onChange={handleChange} 
       />
 
@@ -117,16 +121,16 @@ export const ProfileForm = ({ user }: { user: UserResponse }) => {
           type="button" 
           variant="secondary" 
           onClick={handleCancel} 
-          disabled={!isDirty || updateUserMutation.isPending}
+          disabled={!isDirty || isPending}
         >
           Cancelar
         </Button>
         <Button 
           type="submit" 
           variant="primary" 
-          disabled={!isDirty || searchErrors(errors, updateUserMutation)}
+          disabled={!isDirty || searchErrors(errors, updateMutation)}
         >
-          {updateUserMutation.isPending ? "Guardando..." : "Actualizar Perfil"}
+          {isPending ? "Guardando..." : "Actualizar Perfil"}
         </Button>
       </div>
     </form>

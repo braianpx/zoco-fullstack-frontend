@@ -4,15 +4,15 @@ import { updateSessionLog, deleteSessionLog } from "../api/sessionLogs.api";
 import { useNotification } from "../context/notification/useNotification";
 import type { ApiResponse } from "../types/apiResponse.types";
 import type { AxiosError } from "axios";
+import type { SessionLogUpdate } from "../types/sessionLogs.types";
 
 export const useSessionLogMutations = () => {
   const queryClient = useQueryClient();
   const notify = useNotification();
 
   const updateMutation = useMutation({
-    mutationFn: ({ data, sessionId }: { data: any, sessionId: number }) => updateSessionLog(data, sessionId),
+    mutationFn: ({ data, sessionId }: { data: SessionLogUpdate, sessionId: number }) => updateSessionLog(data, sessionId),
     onSuccess: (response) => {
-      console.log("entro")
       notify(response.message || "session actualizada", "success");
       queryClient.invalidateQueries({ queryKey: ["sessionLogs"] })
     },   

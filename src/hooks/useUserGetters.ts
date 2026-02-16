@@ -1,23 +1,30 @@
-// src/hooks/user/useUserGetters.ts
 import { useQuery } from "@tanstack/react-query";
-import { getUserDetail } from "../api/user.api"; // Ajusta la ruta si es necesario
+import { getAllUser, getUserDetail } from "../api/user.api"; // Ajusta la ruta si es necesario
 import type { UserResponse } from "../types/user.types";
 
-export const useUserGetters = (userId: number | null) => {
-  
-  // El Hook se llama en el nivel superior del componente/hook
-  const userQuery = useQuery<UserResponse>({
+// HOOK PARA PERFIL (Detalle de UN solo usuario)
+export const useUserDetail = (userId: number | null) => {
+  return useQuery({
     queryKey: ["userDetail", userId],
     queryFn: async () => {
-      if (!userId) throw new Error("El ID del usuario no está definido");
+      if (!userId) throw new Error("ID no definido");
       const res = await getUserDetail(userId);
-      return res.data;
+      return res.data; // Retorna UserResponse
     },
-    enabled: !!userId, 
-    retry: false,
+    enabled: !!userId,
+  });
+};
+
+// HOOK PARA DIRECTORIO (Lista de TODOS los usuarios - Admin)
+export const useUserGetters = () => {
+  const query = useQuery({
+    queryKey: ["users"],
+    queryFn: () => getAllUser(),
   });
 
   return {
-    userQuery, // Retornas el objeto de la consulta directamente
+    users: (query.data?.data as UserResponse[]) || [],
+    isLoading: query.isLoading,
+    isError: query.isError
   };
 };

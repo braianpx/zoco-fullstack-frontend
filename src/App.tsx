@@ -10,6 +10,7 @@ import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import { PublicRoute } from "./components/routing/PublicRoute";
 import { useAuth } from "./context/auth/useAuth"; // 2. Importamos tu hook de auth para obtener el rol/id
 import { SessionLog } from "./pages/SessionLog";
+import { User } from "./pages/User";
 
 function App() {
   const { user } = useAuth(); // Obtenemos el usuario logueado
@@ -44,7 +45,7 @@ function App() {
               } 
             />
             
-            {/* <Route path="users" element={<Users />} /> */}
+            <Route path="users" element={<User />} />
           </Route>
         </Route>
 

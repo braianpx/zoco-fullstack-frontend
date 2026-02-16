@@ -1,8 +1,10 @@
+// src/components/forms/LoginForm.tsx
 import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
 import { useAuthMutations } from "../../hooks/useAuthMutations";
-import { validateRegisterField } from "./validators/user.validator"; 
+// CORRECCIÓN: Cambiado validateRegisterField por validateUserField
+import { validateUserField } from "./validators/user.validator"; 
 import { mapErrors } from "./mapErrors";
 import { searchErrors } from "./searchErrors";
 
@@ -22,11 +24,10 @@ export const LoginForm = () => {
     const newForm = { ...form, [key]: value };
     setForm(newForm);
 
-    // Validación local en tiempo real
-    const error = validateRegisterField(key, value, newForm);
+    // CORRECCIÓN: Usamos el nombre correcto de la función y pasamos newForm como 3er argumento
+    const error = validateUserField(key, value, newForm);
     setErrors((prev) => ({ ...prev, [key]: error }));
     
-    // Limpiamos el error del back de ese campo al empezar a escribir
     if (submitErrors[key]) setSubmitErrors(prev => ({ ...prev, [key]: "" }));
   };
 
@@ -36,9 +37,7 @@ export const LoginForm = () => {
 
     try {
       await loginMutation.mutateAsync(form);
-      // Éxito: El hook se encarga del notify, tú podrías redirigir aquí
     } catch (err) {
-      // Usamos tu función mapErrors
       setSubmitErrors(mapErrors(err));
     }
   };
@@ -51,13 +50,11 @@ export const LoginForm = () => {
           label={f.label}
           type={f.type}
           value={form[f.name]}
-          // Prioridad al error local, luego al del back
           error={errors[f.name] || submitErrors[f.name]}
           onChange={(e) => handleChange(f.name, e.target.value)}
         />
       ))}
 
-      {/* Lista de errores combinada */}
       <div className="flex flex-col gap-1">
         {Object.entries(submitErrors).map(([key, msg]) => 
           msg && <span key={key} className="text-red-500 text-xs font-medium">• {msg}</span>
@@ -66,7 +63,6 @@ export const LoginForm = () => {
 
       <Button 
         type="submit" 
-        // Usamos tu función searchErrors
         disabled={searchErrors(errors, loginMutation)}
       >
         {loginMutation.isPending ? "Iniciando..." : "Ingresar"}

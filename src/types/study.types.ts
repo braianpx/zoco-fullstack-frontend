@@ -14,4 +14,5 @@ export interface StudyCreate {
   endDate?: string | null;
 }
 
-export interface StudyUpdate extends StudyCreate {}
+export type StudyUpdate = StudyCreate;
+

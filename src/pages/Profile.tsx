@@ -1,5 +1,4 @@
-// src/pages/Profile.tsx
-import { useUserGetters } from "../hooks/useUserGetters";
+import { useUserDetail } from "../hooks/useUserGetters"; // Cambiado a useUserDetail
 import { ProfileForm } from "../components/forms/ProfileForm";
 import { HeaderSection } from "../components/ui/HeaderSection";
 import { ProfileStats } from "../components/ProfileStats";
@@ -9,14 +8,13 @@ import { useAuth } from "../context/auth/useAuth";
 
 export const Profile = () => {
   const { user } = useAuth();
-  const { userQuery } = useUserGetters(user?.id as number);
   
-  // Idealmente ID desde un AuthContext
-  const { data, isLoading, isError } = userQuery; 
+  // Usamos el hook específico para detalle
+  const { data, isLoading, isError } = useUserDetail(user?.id as number);
 
   if (isLoading) return <LoadingSkeleton messageLoading="Cargando perfil..." />;
 
-  if (isError) return <SectionError message="No pudimos obtener la información de tu perfil en este momento." />;
+  if (isError) return <SectionError message="No pudimos obtener la información de tu perfil." />;
 
   return (
     <div className="max-w-5xl mx-auto py-10 px-6 animate-in fade-in duration-700">

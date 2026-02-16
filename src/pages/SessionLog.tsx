@@ -3,15 +3,18 @@ import { useSessionLogGetters } from "../hooks/useSessionLogGetters";
 import { useSessionLogMutations } from "../hooks/useSessionLogMutations";
 import { SessionLogForm } from "../components/forms/SessionLogForm";
 import { Card } from "../components/ui/Card";
-import { ShieldAlert, Trash2, Clock, Calendar, User as UserIcon, Edit3, X } from "lucide-react";
+import { ShieldAlert, Trash2, Clock, Calendar, User as UserIcon, Edit3 } from "lucide-react";
 import { useAuth } from "../context/auth/useAuth";
 import { Navigate } from "react-router-dom";
+import type { SessionLogResponse } from "../types/sessionLogs.types";
 
 export const SessionLog = () => {
   const { role } = useAuth();
   const { logs, isLoading } = useSessionLogGetters();
   const { deleteMutation, updateMutation } = useSessionLogMutations();
-  const [editingLog, setEditingLog] = useState<any | null>(null);
+  
+  // CORRECCIÓN: Tipado correcto en lugar de 'any'
+  const [editingLog, setEditingLog] = useState<SessionLogResponse | null>(null);
 
   if (role !== "Admin") return <Navigate to="/dashboard/profile" replace />;
 
@@ -24,26 +27,19 @@ export const SessionLog = () => {
   const handleUpdateSession = async (formData: { endDate: Date }) => {
     if (!editingLog) return;
     
-    // El objeto que enviamos al service debe coincidir con SessionLogUpdate { endDate: Date }
-    const updateData = {
-      endDate: new Date(formData.endDate) // Convertimos el string del input a objeto Date
-    };
     try {
       await updateMutation.mutateAsync({ 
-        data: updateData, 
+        data: { endDate: formData.endDate }, 
         sessionId: editingLog.id 
       });
-      setEditingLog(null); // Solo cerramos si la mutación fue exitosa
+      setEditingLog(null);
     } catch (error) {
-      // El error ya debería estar manejado por la mutación o interceptor, 
-      // pero esto evita que el form se cierre si falla.
       console.error("Error al actualizar:", error);
     }
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-10 animate-in fade-in duration-700">
-      {/* Header (igual) */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-100 pb-8 gap-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-600 rounded-full mb-3 border border-amber-100">
@@ -55,7 +51,6 @@ export const SessionLog = () => {
         </div>
       </header>
 
-      {/* Formulario de Edición */}
       {editingLog && (
         <div className="animate-in fade-in slide-in-from-top-4 duration-500 max-w-lg mx-auto w-full mb-10">
           <Card title={`Cerrar sesión: ${editingLog.userName}`}>
@@ -69,11 +64,9 @@ export const SessionLog = () => {
         </div>
       )}
 
-      {/* Grid de Logs (igual al anterior con el botón disparando setEditingLog) */}
       <div className="grid gap-4">
         {logs.map((log) => (
-          <div key={log.id} className="group bg-white border border-slate-200 rounded-[2rem] p-6 hover:shadow-2xl transition-all duration-500">
-            {/* ... Resto del contenido de la card ... */}
+          <div key={log.id} className="group bg-white border border-slate-200 rounded-4xl p-6 hover:shadow-2xl transition-all duration-500">
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
               <div className="flex items-center gap-4">
                 <div className="p-4 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors duration-500">
@@ -102,8 +95,7 @@ export const SessionLog = () => {
                   {!log.endDate && (
                     <button 
                       onClick={() => {
-                        window.scrollTo({ top: 0, behavior: 'smooth' }); // Scroll arriba para ver el form
-                        handleUpdateSession({endDate: new Date()});
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                         setEditingLog(log);
                       }} 
                       className="p-3 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"

@@ -1,79 +1,106 @@
+// src/components/forms/RegisterForm.tsx
 import { useState } from "react";
-import { Input } from "../ui/Input";
+import { useNavigate } from "react-router-dom";
 import { Button } from "../ui/Button";
-import { useUserMutations } from "../../hooks/useUserMutations";
-import { validateRegisterField, validateRegisterForm } from "./validators/user.validator";
+import { Input } from "../ui/Input";
+import { FormErrorList } from "../ui/FormErrorList";
+import { validateUserField, type UserFormType } from "./validators/user.validator";
 import { mapErrors } from "./mapErrors";
 import { searchErrors } from "./searchErrors";
-import { FormErrorList } from "../ui/FormErrorList";
+import { useUserMutations } from "../../hooks/useUserMutations";
+import type { UserCreate } from "../../types/user.types";
 
-// Configuración para iterar los campos
 const FIELDS = [
-  { name: "firstName", label: "Nombre", type: "text" },
-  { name: "lastName", label: "Apellido", type: "text" },
-  { name: "email", label: "Email", type: "email" },
-  { name: "password", label: "Contraseña", type: "password" },
-  { name: "confirmPassword", label: "Confirmar Contraseña", type: "password" },
+  { name: "firstName", label: "Nombre", type: "text", placeholder: "Ej. Juan" },
+  { name: "lastName", label: "Apellido", type: "text", placeholder: "Ej. Pérez" },
+  { name: "email", label: "Correo Electrónico", type: "email", placeholder: "juan@ejemplo.com" },
+  { name: "password", label: "Contraseña", type: "password", placeholder: "••••••••" },
+  { name: "confirmPassword", label: "Confirmar Contraseña", type: "password", placeholder: "••••••••" },
 ] as const;
 
 export const RegisterForm = () => {
-  const { registerMutation } = useUserMutations();
+  const navigate = useNavigate();
+  const { createMutation } = useUserMutations();
+
   const [form, setForm] = useState({
-    firstName: "", lastName: "", email: "", password: "", confirmPassword: "" 
+    firstName: "",
+    lastName: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
   });
+
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitErrors, setSubmitErrors] = useState<Record<string, string>>({});
 
   const handleChange = (key: string, value: string) => {
     const newForm = { ...form, [key]: value };
     setForm(newForm);
-    
-    // Validación inmediata del campo actual
-    const error = validateRegisterField(key, value, newForm);
-    setErrors(prev => ({ ...prev, [key]: error }));
+
+    const error = validateUserField(key, value, newForm as unknown as UserFormType);
+    setErrors((prev) => ({ ...prev, [key]: error }));
+
+    if (submitErrors[key]) setSubmitErrors((prev) => ({ ...prev, [key]: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    // 1. Validar todo el front antes de intentar la petición
-    const localErrors = validateRegisterForm(form);
-    if (Object.keys(localErrors).length > 0) {
-      setErrors(localErrors);
+    setSubmitErrors({});
+
+    if (form.password !== form.confirmPassword) {
+      setErrors(prev => ({ ...prev, confirmPassword: "Las contraseñas no coinciden" }));
       return;
     }
 
     try {
+      // CORRECCIÓN: Usamos desestructuración con un alias que empiece con _
+      // y configuramos el objeto de salida con el tipo correcto (UserCreate)
+      const { ...dataToSubmit } = form;
+     
+      await createMutation.mutateAsync(dataToSubmit as UserCreate);
 
-      await registerMutation.mutateAsync(form);
-      
+      navigate("/login");
     } catch (err) {
-        const newErrors = mapErrors(err); // Ahora newErrors es un Record<string, string>
-        setSubmitErrors(newErrors); // ¡Funciona!
-      } finally {
-        setForm({ firstName: "", lastName: "", email: "", password: "", confirmPassword: "" });
-        setErrors({});
-        setSubmitErrors({});
-      }
-    };
+      setSubmitErrors(mapErrors(err));
+    }
+  };
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-      {FIELDS.map((f) => (
+    <form onSubmit={handleSubmit} className="space-y-5 animate-in fade-in duration-500">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {FIELDS.slice(0, 2).map((f) => (
+          <Input
+            key={f.name}
+            label={f.label}
+            placeholder={f.placeholder}
+            value={form[f.name as keyof typeof form]}
+            error={errors[f.name] || submitErrors[f.name]}
+            onChange={(e) => handleChange(f.name, e.target.value)}
+          />
+        ))}
+      </div>
+
+      {FIELDS.slice(2).map((f) => (
         <Input
           key={f.name}
           label={f.label}
           type={f.type}
-          value={form[f.name]}
-          error={errors[f.name]} // El Input ya recibe el error individual
+          placeholder={f.placeholder}
+          value={form[f.name as keyof typeof form]}
+          error={errors[f.name] || submitErrors[f.name]}
           onChange={(e) => handleChange(f.name, e.target.value)}
         />
       ))}
 
-      <FormErrorList errors={submitErrors}/>
+      <FormErrorList errors={submitErrors} />
 
-      <Button type="submit" disabled={searchErrors(errors, registerMutation)} className="mt-2">
-        {registerMutation.isPending ? "Creando cuenta..." : "Registrarse"}
+      <Button
+        type="submit"
+        variant="primary"
+        className="w-full py-4 mt-2 shadow-lg shadow-indigo-100"
+        disabled={createMutation.isPending || searchErrors(errors, createMutation)}
+      >
+        {createMutation.isPending ? "Creando cuenta..." : "Registrarse"}
       </Button>
     </form>
   );

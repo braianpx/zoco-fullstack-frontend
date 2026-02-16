@@ -40,7 +40,7 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
   return (
     <form 
       onSubmit={handleLocalSubmit} 
-      className="w-full max-w-2xl mx-auto p-6 sm:p-8 bg-white rounded-[2rem] border border-slate-200 shadow-2xl shadow-slate-200/50 space-y-8 animate-in fade-in zoom-in-95 duration-500"
+      className="w-full max-w-2xl mx-auto p-6 sm:p-8 bg-white rounded-4xl border border-slate-200 shadow-2xl shadow-slate-200/50 space-y-8 animate-in fade-in zoom-in-95 duration-500"
     >
       {/* Header simplificado sin paquetes externos */}
       <div className="border-b border-slate-50 pb-6">
@@ -114,7 +114,7 @@ export const AddressForm = ({ initialData, onSubmit, onCancel, isPending, extern
           type="submit" 
           variant="primary" 
           disabled={isPending}
-          className="w-full sm:w-auto min-w-[160px] py-4 shadow-lg shadow-indigo-100"
+          className="w-full sm:w-auto min-w-40 py-4 shadow-lg shadow-indigo-100"
         >
           {isPending ? "Guardando..." : "Guardar Dirección"}
         </Button>

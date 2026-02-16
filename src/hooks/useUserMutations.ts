@@ -1,44 +1,37 @@
-import { useMutation } from "@tanstack/react-query";
-import { register, updateUser } from "../api/user.api";
-import { useNotification } from "../context/notification/useNotification";
-import type { AxiosError } from "axios";
-import type { ApiResponse } from "../types/apiResponse.types";
-import type { UserUpdate } from "../types/user.types";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { register, updateUser, deleteOneUser } from "../api/user.api"; // Ajusta la ruta a tu API
+import type { UserCreate, UserUpdate } from "../types/user.types";
 
 export const useUserMutations = () => {
+  const queryClient = useQueryClient();
 
-  const notify = useNotification();
-
-  const registerMutation = useMutation({
-    mutationFn: register,
-    onSuccess: (response) => {
-      notify(response.message, "success")
-    },
-    onError: (err: AxiosError<ApiResponse<null>>) => {
-      const msgError = err?.response?.data?.message ?? err?.response?.data?.title;
-      notify(
-         msgError ?? "Error inesperado",
-        "error"
-      );
-    },
-  });
-  
-  const updateUserMutation = useMutation({
-    mutationFn: ({ data, userId }: { data: UserUpdate; userId: number }) => {
-      return updateUser(data, userId);
-    },
-    onSuccess: (response) => {
-      notify(response.message?? "Se actualizo el usuario" , "success");
-      return(response.data)
-    },
-    onError: (err: AxiosError<ApiResponse<null>>) => {
-      const msgError = err?.response?.data?.message ?? err?.response?.data?.title;
-      notify(msgError ?? "Error inesperado", "error");
+  const createMutation = useMutation({
+    mutationFn: (data: UserCreate) => register(data),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
     },
   });
 
-  return {
-    registerMutation,
-    updateUserMutation,
+  const updateMutation = useMutation({
+    mutationFn: ({ data, userId }: { data: UserUpdate; userId: number }) => 
+      updateUser(data, userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+      // También invalidamos el detalle por si el usuario está viendo su propio perfil
+      queryClient.invalidateQueries({ queryKey: ["userDetail"] });
+    },
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: (userId: number) => deleteOneUser(userId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["users"] });
+    },
+  });
+
+  return { 
+    createMutation, 
+    updateMutation, 
+    deleteMutation 
   };
 };

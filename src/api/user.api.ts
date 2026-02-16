@@ -16,3 +16,13 @@ export const updateUser = async (data: UserUpdate, userId: number) => {
   const res = await api.put<ApiResponse<UserResponse>>("users/"+ userId, data);
   return res.data;
 };
+
+export const getAllUser = async () => {
+  const res = await api.get<ApiResponse<UserResponse[]>>("users/");
+  return res.data;
+};
+
+export const deleteOneUser = async (userId: number) => {
+  const res = await api.put<ApiResponse<UserResponse>>("users/"+ userId);
+  return res.data;
+};

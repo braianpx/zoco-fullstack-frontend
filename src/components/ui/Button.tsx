@@ -22,7 +22,7 @@ export const Button = ({ children, variant = "primary", className = "", ...props
   return (
     <button
       {...props}
-      // @ts-ignore - Si prefieres no usar el cast, asegúrate que las keys coincidan
+
       className={`${baseStyles} ${variants[variant]} ${className}`}
     >
       {children}

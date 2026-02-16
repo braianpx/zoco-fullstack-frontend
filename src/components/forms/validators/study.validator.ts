@@ -5,7 +5,12 @@ export interface StudyFormType {
   endDate?: string | null;
 }
 
-export const validateStudyField = (name: string, value: any, formData?: any): string => {
+// Reemplazamos 'any' por tipos específicos
+export const validateStudyField = (
+  name: string, 
+  value: string | null | undefined, 
+  formData?: StudyFormType
+): string => {
   switch (name) {
     case "institution":
       if (!value) return "La institución es obligatoria";

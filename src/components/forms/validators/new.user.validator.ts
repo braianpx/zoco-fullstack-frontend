@@ -1,6 +1,5 @@
 import type { UserCreate, UserUpdate } from "../../../types/user.types";
 
-// 1. Exportamos el tipo unificado
 export type UserFormType = Partial<UserCreate & UserUpdate> & Record<string, unknown>;
 
 const validationRules: Record<string, (value: string, form: UserFormType) => string> = {
@@ -22,31 +21,15 @@ const validationRules: Record<string, (value: string, form: UserFormType) => str
     return !emailRegex.test(v) ? "Formato de email inválido" : "";
   },
   password: (v, form) => {
-    // Si hay un ID o ya tiene datos cargados, es edición y el password es opcional
-    if ((form.id || form.email) && !v) return ""; 
+    // Si hay un ID en el form, estamos editando -> password opcional
+    if (form.id && !v) return ""; 
     if (!v) return "La contraseña es obligatoria";
     return v.length < 6 ? "Mínimo 6 caracteres" : "";
   },
-  confirmPassword: (v, form) => 
-    v !== String(form.password ?? "") ? "Las contraseñas no coinciden" : "",
   roleName: (v) => (!v ? "El rol es obligatorio" : ""),
 };
 
-// 2. Exportamos con el nombre que pide el componente
 export const validateUserField = (key: string, value: string, form: UserFormType): string => {
   const rule = validationRules[key];
   return rule ? rule(value, form) : "";
-};
-
-// 3. Exportamos el validador general para el submit
-export const validateUserForm = (form: UserFormType) => {
-  const errors: Record<string, string> = {};
-  (Object.keys(form) as Array<keyof UserFormType>).forEach((key) => {
-    if (key in validationRules) {
-      const value = String(form[key] || "");
-      const error = validateUserField(key as string, value, form);
-      if (error) errors[key as string] = error;
-    }
-  });
-  return errors;
 };
