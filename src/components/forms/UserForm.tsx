@@ -76,24 +76,47 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
         </div>
       </div>
 
-      {/* 4. SESSION LOGS (NUEVO) */}
+
+      {/* 4. SESSION LOGS (Estilo Original Corregido) */}
       <div className="bg-slate-900 rounded-[2rem] p-6 text-white">
         <div className="flex items-center gap-2 mb-4 text-indigo-300">
           <History size={16} />
-          <span className="text-[10px] font-black uppercase tracking-widest">Historial de Sesiones (Session Logs)</span>
+          <span className="text-[10px] font-black uppercase tracking-widest">Historial de Sesiones</span>
         </div>
+        
         <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar-dark">
-          {(defaultValues as any)?.sessionLogs?.length > 0 ? (defaultValues as any).sessionLogs.map((log: any, i: number) => (
-            <div key={i} className="flex justify-between items-center text-[10px] bg-slate-800/50 p-3 rounded-xl border border-slate-700">
-              <div className="flex items-center gap-2">
-                <Calendar size={12} className="text-indigo-400" />
-                <span className="font-mono text-slate-300">{new Date(log.loginTime).toLocaleString()}</span>
-              </div>
-              <span className={`px-2 py-0.5 rounded-md font-black uppercase ${log.status === 'Success' ? 'text-emerald-400' : 'text-rose-400'}`}>
-                {log.status || 'Active'}
-              </span>
-            </div>
-          )) : <p className="text-xs text-slate-500 italic">No hay logs de actividad.</p>}
+          {(defaultValues as any)?.sessionLogs?.length > 0 ? (
+            [...(defaultValues as any).sessionLogs]
+              .sort((a, b) => {
+                const dateA = new Date(a.loginTime || a.startDate || a).getTime();
+                const dateB = new Date(b.loginTime || b.startDate || b).getTime();
+                return dateB - dateA;
+              })
+              .map((log: any, i: number) => {
+                // Extraemos la fecha de forma segura
+                const rawDate = log.loginTime || log.startDate || (typeof log === 'string' ? log : null);
+                const dateObj = new Date(rawDate);
+                
+                // Formateo simple para el span
+                const displayDate = !isNaN(dateObj.getTime()) 
+                  ? `${dateObj.toLocaleDateString('es-AR')} - ${dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
+                  : "Fecha no disponible";
+
+                return (
+                  <div key={i} className="flex justify-between items-center text-[10px] bg-slate-800/50 p-3 rounded-xl border border-slate-700">
+                    <div className="flex items-center gap-2">
+                      <Calendar size={12} className="text-indigo-400" />
+                      <span className="font-mono text-slate-300">{displayDate}</span>
+                    </div>
+                    <span className={`px-2 py-0.5 rounded-md font-black uppercase ${log.status === 'Success' ? 'text-emerald-400' : 'text-rose-400'}`}>
+                      {log.status || 'Active'}
+                    </span>
+                  </div>
+                );
+              })
+          ) : (
+            <p className="text-xs text-slate-500 italic">No hay logs de actividad.</p>
+          )}
         </div>
       </div>
 

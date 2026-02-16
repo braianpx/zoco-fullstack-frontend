@@ -4,53 +4,51 @@ import { MainLayout } from "./layouts/MainLayout";
 import { Home } from "./pages/Home";
 import { Dashboard } from "./pages/Dashboard";
 import { Profile } from "./pages/Profile";
-import { Address } from "./pages/Address"; 
-import { Study } from "./pages/Study"; // 1. Importamos la página de estudios
-import { ProtectedRoute } from "./components/routing/ProtectedRoute";
-import { PublicRoute } from "./components/routing/PublicRoute";
-import { useAuth } from "./context/auth/useAuth"; // 2. Importamos tu hook de auth para obtener el rol/id
+import { Address } from "./pages/Address";
+import { Study } from "./pages/Study";
 import { SessionLog } from "./pages/SessionLog";
 import { User } from "./pages/User";
+import { ProtectedRoute } from "./components/routing/ProtectedRoute";
+import { PublicRoute } from "./components/routing/PublicRoute";
+import { useAuth } from "./context/auth/useAuth";
 
 function App() {
-  const { user } = useAuth(); // Obtenemos el usuario logueado
+  const { user } = useAuth();
+  const isAdmin = user?.roleName === "Admin";
 
   return (
     <BrowserRouter>
       <Routes>
+        {/* LAYOUT PRINCIPAL */}
         <Route element={<MainLayout />}>
-          {/* Rutas Públicas */}
+          
+          {/* 1. RUTAS PÚBLICAS (Solo accesibles sin login) */}
           <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
 
-          {/* Ruta Dashboard Protegida (Actúa como Layout) */}
-          <Route
-            path="/dashboard"
-            element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
-            }
-          >
+          {/* 2. RUTAS PROTEGIDAS (Cualquier usuario logueado) */}
+          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
+            
+            {/* Sub-rutas de Dashboard */}
             <Route path="profile" element={<Profile />} />
-            <Route path="addresses" element={<Address />} /> 
-            <Route path="logs" element={<SessionLog />} />
-            {/* 3. Añadimos la ruta para estudios pasando las props necesarias */}
+            <Route path="addresses" element={<Address />} />
             <Route 
               path="studies" 
-              element={
-                <Study 
-                  userId={user?.id ?? null} 
-                  isAdmin={user?.roleName === "Admin"} 
-                />
-              } 
+              element={<Study userId={user?.id ?? null} isAdmin={isAdmin} />} 
             />
-            
-            <Route path="users" element={<User />} />
+
+            {/* 3. RUTAS DE ADMINISTRADOR (Protección extra por Rol) */}
+            {isAdmin && (
+              <ProtectedRoute>
+                <Route path="users" element={<User />} />
+                <Route path="logs" element={<SessionLog />} />
+              </ProtectedRoute>
+            )}
           </Route>
+
         </Route>
 
-        {/* Redirección por defecto si la ruta no existe */}
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        {/* Redirección por defecto */}
+        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
       </Routes>
     </BrowserRouter>
   );
