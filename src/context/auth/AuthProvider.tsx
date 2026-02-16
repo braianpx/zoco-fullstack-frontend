@@ -15,7 +15,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
     sessionStorage.setItem("token", token);
     sessionStorage.setItem("user", JSON.stringify(user));
     sessionStorage.setItem("role", JSON.stringify(role));
-    setUser(user);
+    setUser({...user, roleName: role});
   };
 
   const logout = () => {

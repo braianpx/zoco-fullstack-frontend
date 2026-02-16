@@ -17,7 +17,7 @@ export const Navbar: FC = () => {
       {isAuthenticated ? (
         <div className="flex items-center gap-6">
           {/* Menú de usuario */}
-          <UserMenu username={(user?.firstName + " " +  user?.lastName) || "undefined"} onLogout={logout} />
+          <UserMenu username={(user?.firstName + " " +  user?.lastName) || "undefined"} onLogout={logout} role={user?.roleName as string} />
         </div>
       ) : (
         // Si no hay sesión, navbar vacío o minimalista
