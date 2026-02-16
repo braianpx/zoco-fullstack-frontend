@@ -2,12 +2,11 @@ import type { UseMutationResult } from "@tanstack/react-query";
 
 export const searchErrors = (
   errors: Record<string, string>, 
-  submitErrors: Record<string, string>,
   // Usamos "any" en los genéricos para que acepte cualquier respuesta/payload
   registerMutation: UseMutationResult<any, any, any, any>
 ): boolean => {
   // 1. Unimos ambos objetos
-  const allErrors = { ...errors, ...submitErrors };
+  const allErrors = { ...errors };
 
   // 2. Verificamos si hay algún mensaje con contenido
   const hasMessages = Object.values(allErrors).some(
