@@ -7,3 +7,11 @@ export interface StudyResponse {
     userId: number;
     userName?: string;
 }
+export interface StudyCreate {
+  institution: string;
+  degree: string;
+  startDate: string; 
+  endDate?: string | null;
+}
+
+export interface StudyUpdate extends StudyCreate {}
