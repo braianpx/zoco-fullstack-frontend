@@ -4,15 +4,17 @@ import type { StudyCreate } from "../../types/study.types";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { validateStudyField } from "./validators/study.validator";
+import { UserCheck } from "lucide-react";
 
 interface Props {
   onSubmit: (data: StudyCreate) => void;
-  defaultValues?: Partial<StudyCreate & { userName?: string }>;
+  defaultValues?: StudyCreate;
   isLoading: boolean;
   isEditing?: boolean;
+  isAdmin: boolean;
 }
 
-export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing }: Props) => {
+export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing, isAdmin }: Props) => {
   // Reemplazamos 'watch' por 'getValues'
   const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<StudyCreate>({
     defaultValues
@@ -23,20 +25,35 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing }: Pro
   }, [defaultValues, reset]);
 
   const userName = defaultValues?.userName;
+ 
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-      {userName && (
-        <div className="flex items-center gap-3 p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-2">
-          <div className="w-10 h-10 rounded-full bg-white border border-slate-200 flex items-center justify-center text-indigo-600 shadow-sm font-bold text-sm">
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+    {userName && isAdmin && (
+      <div className="flex items-center gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 mb-6 group transition-all hover:bg-indigo-50">
+        {/* Avatar con inicial y un badge de verificación */}
+        <div className="relative">
+          <div className="w-11 h-11 rounded-full bg-white border-2 border-indigo-200 flex items-center justify-center text-indigo-600 shadow-sm font-bold text-base transition-transform group-hover:scale-105">
             {userName.charAt(0).toUpperCase()}
           </div>
-          <div className="flex flex-col">
-            <span className="text-[10px] font-bold text-slate-400 uppercase tracking-widest leading-none">Perfil de</span>
-            <span className="text-sm font-semibold text-slate-700">{userName}</span>
+          <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white rounded-full p-1 border-2 border-white shadow-sm">
+            <UserCheck size={10} strokeWidth={3} />
           </div>
         </div>
-      )}
+
+        <div className="flex flex-col">
+          <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-[0.1em] leading-none mb-1">
+            Gestión de Usuario (Modo Admin)
+          </span>
+          <div className="flex items-center gap-1">
+            <span className="text-sm font-semibold text-slate-700">Propiedad de:</span>
+            <span className="text-sm font-bold text-indigo-700 underline decoration-indigo-200 underline-offset-4">
+              {userName}
+            </span>
+          </div>
+        </div>
+      </div>
+    )}
 
       <Input 
         label="Título / Carrera"
