@@ -51,6 +51,9 @@ export const LoginForm = () => {
     }
   };
 
+  // Definimos si el formulario está incompleto
+  const isFormEmpty = !form.email.trim() || !form.password.trim();
+
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-4">
       {FIELDS.map((f) => (
@@ -73,7 +76,7 @@ export const LoginForm = () => {
 
       <Button 
         type="submit" 
-        disabled={searchErrors(errors, loginMutation)}
+        disabled={isFormEmpty || !!searchErrors(errors, loginMutation)}
       >
         {loginMutation.isPending ? "Iniciando..." : "Ingresar"}
       </Button>
