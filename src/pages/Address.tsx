@@ -9,6 +9,7 @@ import { mapErrors } from "../components/forms/mapErrors";
 // Usamos los mismos iconos que en Study
 import { Trash2, Edit3, MapPin, Plus, X } from "lucide-react"; 
 import type { AddressResponse, AddressCreate } from "../types/address.types";
+import { Card } from "../components/ui/Card";
 
 export const Address = () => {
   const { user, role } = useAuth();
@@ -18,7 +19,7 @@ export const Address = () => {
   const { createAddressMutation, updateAddressMutation, deleteAddressMutation, isPending } = useAddressMutations();
 
   const [isAdding, setIsAdding] = useState(false);
-  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editing, setEditing] = useState<AddressResponse | null>(null);
   const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
 
   const handleAction = async (data: AddressCreate, id?: number) => {
@@ -26,7 +27,7 @@ export const Address = () => {
       setBackendErrors({});
       if (id) {
         await updateAddressMutation.mutateAsync({ data, addressId: id });
-        setEditingId(null);
+        setEditing(null);
       } else {
         await createAddressMutation.mutateAsync(data);
         setIsAdding(false);
@@ -34,6 +35,11 @@ export const Address = () => {
     } catch (err) {
       setBackendErrors(mapErrors(err));
     }
+  };
+
+  const closeForm = () => {
+    setIsAdding(false)
+    setEditing(null)
   };
 
   if (isLoading) return (
@@ -44,7 +50,7 @@ export const Address = () => {
   );
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-10 animate-in fade-in duration-700">
+    <div className="max-w-5xl mx-auto p-6 space-y-10 animate-in fade-in duration-700">
       
       {/* Header Estilo Study */}
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-100 pb-8 gap-6">
@@ -55,22 +61,46 @@ export const Address = () => {
         
         <Button 
           variant={isAdding ? "ghost" : "primary"}
-          onClick={() => { setIsAdding(!isAdding); setEditingId(null); }} 
+          onClick={() => { setIsAdding(!isAdding); setEditing(null); }} 
           className="w-full md:w-auto shadow-xl shadow-indigo-100"
         >
-          {isAdding ? <X size={20} /> : <Plus size={20} />}
-          {isAdding ? "Cancelar" : "Nueva Dirección"}
+          <Plus size={20} />
+          Nueva Dirección
         </Button>
       </header>
 
-      {isAdding && (
-        <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-          <AddressForm 
-            onSubmit={(data) => handleAction(data)} 
-            onCancel={() => setIsAdding(false)} 
-            isPending={isPending} 
-            externalErrors={backendErrors}
+      {/* Form Section - Direcciones */}
+      {(isAdding || editing) && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 h-full">
+          {/* Backdrop - Cierra al hacer click fuera */}
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" 
+            onClick={closeForm} 
           />
+
+          {/* Modal Content */}
+          <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-300">
+            
+            {/* Botón Cerrar (X) - Estilo idéntico a Estudios */}
+            <button 
+              onClick={closeForm}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full transition-colors hover:bg-red-100 text-slate-300 hover:text-red-500"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+              <Card title={editing ? "Editar Dirección" : "Registrar Nueva Dirección"}>
+                <AddressForm 
+                  onSubmit={handleAction} // Simplificado: ya recibe los datos del form
+                  isLoading={isPending}   // Cambiado de isPending a isLoading (nombre en Estudios)
+                  isEditing={!!editing} // Pasamos el booleano si existe ID
+                  isAdmin={user?.roleName === "Admin"} // Para activar el banner de Admin
+                  defaultValues={editing?? undefined}
+                />
+              </Card>
+            </div>
+          </div>
         </div>
       )}
 
@@ -81,15 +111,6 @@ export const Address = () => {
             key={address.id} 
             className="group relative bg-white border border-slate-200 rounded-[2.5rem] p-8 hover:shadow-2xl transition-all duration-500"
           >
-            {editingId === address.id ? (
-              <AddressForm 
-                initialData={address}
-                onSubmit={(data) => handleAction(data, address.id)}
-                onCancel={() => setEditingId(null)}
-                isPending={isPending}
-                externalErrors={backendErrors}
-              />
-            ) : (
               <div className="flex flex-col h-full">
                 <div className="flex justify-between items-start mb-6">
                    <div className="p-4 bg-indigo-50 text-indigo-600 rounded-2xl">
@@ -99,14 +120,14 @@ export const Address = () => {
                    {/* BOTONES IGUALES A STUDY (Aparecen al hacer hover en desktop) */}
                    <div className="flex gap-2 transition-opacity duration-300">
                      <button 
-                       onClick={() => { setEditingId(address.id); setBackendErrors({}); }} 
-                       className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                       onClick={() => { setEditing(address); setBackendErrors({}); }} 
+                       className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                      >
                        <Edit3 size={20} />
                      </button>
                      <button 
                        onClick={() => { if(confirm("¿Eliminar?")) deleteAddressMutation.mutate(address.id); }} 
-                       className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
+                       className="p-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all"
                      >
                        <Trash2 size={20} />
                      </button>
@@ -118,19 +139,24 @@ export const Address = () => {
                     {address.street}
                   </h4>
                   <p className="text-slate-500 font-medium">{address.city}, {address.country}</p>
-                  
                   <div className="pt-4">
                     <span className="px-3 py-1.5 bg-slate-50 text-slate-400 text-[13px] font-mono font-bold rounded-lg border border-slate-100">
                       CP: {address.postalCode || 'N/A'}
                     </span>
                   </div>
+                  { true &&
+                      <div className="flex items-center justify-between mt-3 border-t border-slate-50">
+                        <span className="max-w-48 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">
+                          Propiedad de: {address?.userName || 'indefinido'}
+                        </span>
+                        <span className="text-[10px] text-slate-300 font-bold">UID: {address?.id}</span>
+                      </div>
+                  }
                 </div>
               </div>
-            )}
           </div>
         ))}
       </div>
-
       {/* Empty State */}
       {addresses.length === 0 && !isAdding && (
         <div className="py-24 text-center border-2 border-dashed border-slate-200 rounded-[3rem] bg-slate-50/50">

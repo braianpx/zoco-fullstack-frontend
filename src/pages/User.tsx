@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useUserDetail, useUserGetters } from "../hooks/useUserGetters";
 import { useUserMutations } from "../hooks/useUserMutations";
-import { UserForm } from "../components/forms/UserForm";
+import { UserForm, type UserFormType } from "../components/forms/UserForm";
 import { Button } from "../components/ui/Button";
 import { 
   User as UserIcon, Mail, Trash2,
@@ -9,7 +9,6 @@ import {
   ExternalLink
 } from "lucide-react";
 import type { UserResponse, UserCreate, UserUpdate } from "../types/user.types";
-import type { UserFormData } from "../components/forms/UserForm";
 
 export const User = () => {
   const { users, isLoading: isLoadingList } = useUserGetters();
@@ -20,7 +19,7 @@ export const User = () => {
 
   const { data: detailedUser, isLoading: isLoadingDetail } = useUserDetail(selectedUserId || 0);
  
-  const handleAction = async (data: UserFormData) => {
+  const handleAction = async (data: UserFormType) => {
     if (selectedUserId) {
       await updateMutation.mutateAsync({ 
         data: data as UserUpdate, 
@@ -66,7 +65,7 @@ export const User = () => {
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in" onClick={closeModal} />
           <div className="relative w-full max-w-2xl bg-white rounded-4xl shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-300">
             <div className="sm:p-12 p-4 overflow-y-auto max-h-[90vh]">
-              <div className="flex sm:justify-between justify-end items-start mb-8">
+              <div className="flex sm:justify-between justify-center items-start mb-8">
                 <div className="flex flex-col sm:flex-row items-center gap-4">
                   <div className="p-4 bg-indigo-600 text-white rounded-3xl shadow-lg">
                     <UserIcon size={32} />
@@ -91,7 +90,7 @@ export const User = () => {
                   onSubmit={handleAction}
                   isLoading={createMutation.isPending || updateMutation.isPending}
                   isEditing={!!selectedUserId}
-                  defaultValues={detailedUser || undefined}
+                  defaultValues={detailedUser ?? undefined}
                 />
               )}
             </div>

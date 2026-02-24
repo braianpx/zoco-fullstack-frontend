@@ -1,76 +1,92 @@
 import { useForm } from "react-hook-form";
-import { useEffect } from "react";
-import type { StudyCreate } from "../../types/study.types";
+import { useEffect, useMemo } from "react";
+import type { StudyCreate, StudyResponse } from "../../types/study.types";
 import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { validateStudyField } from "./validators/study.validator";
 import { UserCheck } from "lucide-react";
 
+// Definimos el tipo exacto que manejará el estado interno del formulario
+export type StudyFormType = Omit<StudyCreate, 'startDate' | 'endDate'> & {
+  startDate: string;
+  endDate: string | "";
+  userName?: string; 
+};
+
 interface Props {
-  onSubmit: (data: StudyCreate) => void;
-  defaultValues?: StudyCreate;
+  onSubmit: (data: StudyFormType) => void;
+  defaultValues?: StudyResponse;
   isLoading: boolean;
   isEditing?: boolean;
   isAdmin: boolean;
 }
 
 export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing, isAdmin }: Props) => {
-  // Reemplazamos 'watch' por 'getValues'
-  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<StudyCreate>({
-    defaultValues
+  
+  // Función interna para transformar Date | string -> YYYY-MM-DD
+  const formatToInputDate = (date: Date | string | null | undefined): string => {
+    if (!date) return "";
+    const d = new Date(date);
+    return isNaN(d.getTime()) ? "" : d.toISOString().split('T')[0];
+  };
+
+  // Memorizamos la transformación para evitar cálculos innecesarios
+  const initialData = useMemo((): StudyFormType | undefined => {
+    if (!defaultValues) return undefined;
+    return {
+      ...defaultValues,
+      startDate: formatToInputDate(defaultValues.startDate),
+      endDate: formatToInputDate(defaultValues.endDate),
+      userName: defaultValues.userName,
+    } as StudyFormType;
+  }, [defaultValues]);
+
+  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<StudyFormType>({
+    defaultValues: initialData
   });
 
+  // Sincronizar el formulario cuando cambian los datos (ej: al abrir un editar diferente)
   useEffect(() => {
-    if (defaultValues) reset(defaultValues);
-  }, [defaultValues, reset]);
-
-  const userName = defaultValues?.userName;
- 
+    if (initialData) {
+      reset(initialData);
+    }
+  }, [initialData, reset]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
-    {userName && isAdmin && (
-      <div className="flex items-center gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 mb-6 group transition-all hover:bg-indigo-50">
-        {/* Avatar con inicial y un badge de verificación */}
-        <div className="relative">
-          <div className="w-11 h-11 rounded-full bg-white border-2 border-indigo-200 flex items-center justify-center text-indigo-600 shadow-sm font-bold text-base transition-transform group-hover:scale-105">
-            {userName.charAt(0).toUpperCase()}
+      {initialData?.userName && isAdmin && (
+        <div className="flex items-center gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 mb-6 group transition-all hover:bg-indigo-50">
+          <div className="relative">
+            <div className="w-11 h-11 rounded-full bg-white border-2 border-indigo-200 flex items-center justify-center text-indigo-600 shadow-sm font-bold text-base transition-transform group-hover:scale-105">
+              {initialData.userName.charAt(0).toUpperCase()}
+            </div>
+            <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white rounded-full p-1 border-2 border-white shadow-sm">
+              <UserCheck size={10} strokeWidth={3} />
+            </div>
           </div>
-          <div className="absolute -bottom-1 -right-1 bg-indigo-600 text-white rounded-full p-1 border-2 border-white shadow-sm">
-            <UserCheck size={10} strokeWidth={3} />
-          </div>
-        </div>
-
-        <div className="flex flex-col">
-          <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-[0.1em] leading-none mb-1">
-            Gestión de Usuario (Modo Admin)
-          </span>
-          <div className="flex items-center gap-1">
-            <span className="text-sm font-semibold text-slate-700">Propiedad de:</span>
-            <span className="text-sm font-bold text-indigo-700 underline decoration-indigo-200 underline-offset-4">
-              {userName}
+          <div className="flex flex-col">
+            <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-[0.1em] leading-none mb-1">
+              Gestión de Usuario (Modo Admin)
             </span>
+            <div className="flex items-center gap-1 text-sm font-semibold text-slate-700">
+              Propiedad de: <span className="font-bold text-indigo-700 underline decoration-indigo-200 underline-offset-4">{initialData.userName}</span>
+            </div>
           </div>
         </div>
-      </div>
-    )}
+      )}
 
       <Input 
         label="Título / Carrera"
         placeholder="Ej. Licenciatura en Sistemas"
         error={errors.degree?.message}
-        {...register("degree", { 
-          validate: (v) => validateStudyField("degree", v) || true 
-        })} 
+        {...register("degree", { validate: (v) => validateStudyField("degree", v) || true })} 
       />
 
       <Input 
         label="Institución"
-        placeholder="Ej. Universidad Tecnológica Nacional"
+        placeholder="Ej. Universidad"
         error={errors.institution?.message}
-        {...register("institution", { 
-          validate: (v) => validateStudyField("institution", v) || true 
-        })} 
+        {...register("institution", { validate: (v) => validateStudyField("institution", v) || true })} 
       />
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -78,17 +94,14 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing, isAdm
           label="Fecha de Inicio"
           type="date"
           error={errors.startDate?.message}
-          {...register("startDate", { 
-            validate: (v) => validateStudyField("startDate", v) || true 
-          })} 
+          {...register("startDate", { validate: (v) => validateStudyField("startDate", v) || true })} 
         />
         <Input 
           label="Fecha de Fin"
           type="date"
           error={errors.endDate?.message}
           {...register("endDate", { 
-            // Inyectamos getValues() directamente para comparar las fechas sin causar re-renders
-            validate: (v) => validateStudyField("endDate", v, getValues()) || true 
+            validate: (v) => validateStudyField("endDate", v || "", getValues() as any) || true 
           })} 
         />
       </div>

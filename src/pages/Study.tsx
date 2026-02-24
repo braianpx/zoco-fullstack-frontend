@@ -1,11 +1,11 @@
 import { useState } from "react";
 import { useStudyGetters } from "../hooks/useStudyGetters";
 import { useStudyMutations } from "../hooks/useStudyMutations";
-import { StudyForm } from "../components/forms/StudyForm";
+import { StudyForm, type StudyFormType } from "../components/forms/StudyForm";
 import { Card } from "../components/ui/Card"; 
 import { Button } from "../components/ui/Button";
 import { Trash2, Edit3, Plus, X, GraduationCap, Calendar } from "lucide-react"; 
-import type { StudyResponse, StudyCreate } from "../types/study.types";
+import type { StudyResponse, StudyCreate, StudyUpdate } from "../types/study.types";
 
 export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boolean }) => {
   const [editingStudy, setEditingStudy] = useState<StudyResponse | null>(null);
@@ -19,12 +19,12 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
     setEditingStudy(null);
   };
 
-  const handleSubmit = async (data: StudyCreate) => {
+  const handleSubmit = async (data: StudyFormType) => {
     const payload = { ...data, endDate: data.endDate === "" ? null : data.endDate };
     if (editingStudy) {
-      await updateStudyMutation.mutateAsync({ data: payload, studyId: editingStudy.id });
+      await updateStudyMutation.mutateAsync({ data: payload as StudyUpdate, studyId: editingStudy.id });
     } else {
-      await createStudyMutation.mutateAsync(payload);
+      await createStudyMutation.mutateAsync(payload as StudyCreate);
     }
     closeForm();
   };
@@ -45,7 +45,7 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
           onClick={() => (isAdding || editingStudy ? closeForm() : setIsAdding(true))}
           className="w-full md:w-auto shadow-xl shadow-indigo-100"
         >
-          {isAdding && <Plus size={20} />}
+          <Plus size={20} />
           Nuevo Estudio
         </Button>
       </header>
@@ -77,14 +77,7 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
                     onSubmit={handleSubmit}
                     isLoading={createStudyMutation.isPending || updateStudyMutation.isPending}
                     isEditing={!!editingStudy}
-                    defaultValues={editingStudy ? {
-                      ...editingStudy,
-                      startDate: new Date(editingStudy.startDate).toISOString().split('T')[0],
-                      endDate: editingStudy.endDate 
-                        ? new Date(editingStudy.endDate).toISOString().split('T')[0] 
-                        : null,
-                      userName: editingStudy?.userName
-                    }: undefined} 
+                    defaultValues={editingStudy ?? undefined} 
                   />
               </Card>
             </div>
