@@ -83,7 +83,7 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
                 <GraduationCap size={28} />
               </div>
               
-              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <div className="flex gap-2 transition-opacity duration-300">
                 <button onClick={() => setEditingStudy(study)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
                   <Edit3 size={20} />
                 </button>

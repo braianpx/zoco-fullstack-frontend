@@ -49,7 +49,7 @@ export const User = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6 space-y-10">
-      <header className="flex justify-between items-end border-b border-slate-100 pb-8">
+      <header className="flex flex-col gap-6 items-center sm:flex-row justify-between sm:items-end border-b border-slate-100 sm:pb-8">
         <div>
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Directorio</h1>
           <p className="text-slate-500 mt-1">Gestión de perfiles y formación académica.</p>
@@ -100,14 +100,14 @@ export const User = () => {
       )}
 
       {/* --- GRILLA DE USUARIOS --- */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
         {users?.map((u: UserResponse) => (
           <div key={u.id} className="bg-white border border-slate-200 rounded-[2.5rem] p-8 hover:shadow-2xl transition-all duration-500 group">
             <div className="flex justify-between items-start mb-6">
               <div className="p-4 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors">
                 <UserIcon size={28} />
               </div>
-              <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              <div className="flex gap-2">
                 <button onClick={() => openEdit(u)} className="p-2 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-xl"><Edit3 size={18} /></button>
                 <button onClick={() => confirm("¿Borrar?") && deleteMutation.mutate(u.id)} className="p-2 text-slate-400 hover:text-red-600 bg-slate-50 rounded-xl"><Trash2 size={18} /></button>
               </div>
