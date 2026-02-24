@@ -52,13 +52,47 @@ h1 {
 
 button {
   border-radius: 8px;
-  padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
   cursor: pointer;
   transition: border-color 0.25s;
 }
+
+@layer base {
+    html {
+    scroll-behavior: smooth;
+  }
+
+  ::-webkit-scrollbar {
+    width: 12px; /* Ancho de la zona del scroll */
+  }
+
+  ::-webkit-scrollbar-track {
+    /* Aquí creamos un "margen" arriba y abajo para que el track no ocupe todo */
+    background: transparent;
+    margin-block: 20px; /* <--- ESTO separa el scroll de los extremos arriba y abajo */
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background-color: #4f46e5; /* indigo-600 */
+    border-radius: 20px;
+    
+    /* Grosor de la barrita interna */
+    border: 3px solid transparent; 
+    background-clip: content-box;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: #4338ca;
+  }
+
+  ::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+
 
 
 @media (prefers-color-scheme: light) {
