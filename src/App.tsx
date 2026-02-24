@@ -39,18 +39,10 @@ function App() {
             {/* 3. RUTAS DE ADMINISTRADOR (Protección extra por Rol) */}
             {isAdmin && (
               <>
-                <Route path="users" element={
-                  <ProtectedRoute>
-                    <User />
-                  </ProtectedRoute>
-                  } />
-                <Route path="logs" element={ 
-                  <ProtectedRoute>
-                    <SessionLog />
-                  </ProtectedRoute>
-                    } />
-                </>
-            )} 
+                <Route path="users" element={<ProtectedRoute> <User /> </ProtectedRoute>} />
+                <Route path="logs" element={<ProtectedRoute> <SessionLog /> </ProtectedRoute>} />
+              </>
+            )}
           </Route>
         </Route>
 

@@ -5,6 +5,7 @@ import { validateUserField } from "./validators/new.user.validator";
 import { MapPin, GraduationCap, Shield, History, Calendar } from "lucide-react";
 import type { UserResponse } from "../../types/user.types";
 import { useAuth } from "../../context/auth/useAuth";
+import type { SessionLogResponse } from "../../types/sessionLogs.types";
 
 export type UserFormData = Partial<UserResponse> & {
   password?: string;
@@ -93,14 +94,14 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
             <div className="space-y-2 max-h-40 overflow-y-auto pr-2 custom-scrollbar-dark">
               {defaultValues?.sessionLogs && defaultValues.sessionLogs.length > 0 ? (
                 // Forzamos el array a Record para que acepte cualquier string como propiedad
-                (defaultValues.sessionLogs as Record<string, any>[])
+               (defaultValues.sessionLogs as unknown as SessionLogResponse[])
                   .sort((a, b) => {
-                    const dateA = new Date(a.loginTime || a.startDate || "").getTime();
-                    const dateB = new Date(b.loginTime || b.startDate || "").getTime();
+                    const dateA = new Date(a.endDate || a.startDate || "").getTime();
+                    const dateB = new Date(b.endDate || b.startDate || "").getTime();
                     return dateB - dateA;
                   })
                   .map((log, i) => {
-                    const dateObj = new Date(log.loginTime || log.startDate || "");
+                    const dateObj = new Date(log.endDate || log.startDate || "");
                     const displayDate = !isNaN(dateObj.getTime()) 
                       ? `${dateObj.toLocaleDateString('es-AR')} - ${dateObj.toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}`
                       : "Fecha no disponible";
@@ -111,10 +112,7 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
                           <Calendar size={12} className="text-indigo-400" />
                           <span className="font-mono text-slate-300">{displayDate}</span>
                         </div>
-                        <span className={`px-2 py-0.5 rounded-md font-black uppercase ${
-                          log.status === 'Success' || log.isSuccess === true ? 'text-emerald-400' : 'text-rose-400'
-                        }`}>
-                          {log.status || (log.isSuccess ? 'Success' : 'Failed')}
+                        <span className={`px-2 py-0.5 rounded-md font-black uppercase text-emerald-400`}>
                         </span>
                       </div>
                     );
