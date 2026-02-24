@@ -8,7 +8,7 @@ export interface UserResponse {
   firstName: string
   lastName: string
   roleId?: number
-  roleName?: string
+  roleName?: "Admin" | "User" | null
   studies?: Array<StudyResponse>
   addresses?: Array<AddressResponse>
   sessionLogs?: Array<SessionLogResponse>

@@ -12,6 +12,7 @@ export interface StudyCreate {
   degree: string;
   startDate: string; 
   endDate?: string | null;
+  userName?: string 
 }
 
 export type StudyUpdate = StudyCreate;
