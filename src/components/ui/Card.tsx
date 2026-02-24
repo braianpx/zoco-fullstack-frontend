@@ -14,7 +14,7 @@ export const Card = ({ title, children }: Props) => {
           <div className="h-1 w-12 bg-indigo-600 mt-2 rounded-full"></div>
         </div>
       )}
-      <div className="p-8">{children}</div>
+      <div className="px-8 pb-8">{children}</div>
     </div>
   );
 };
