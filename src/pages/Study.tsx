@@ -14,9 +14,6 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
   const { studies, isLoading } = useStudyGetters(userId, isAdmin);
   const { createStudyMutation, updateStudyMutation, deleteStudyMutation } = useStudyMutations();
 
-  // Definición de displayUserName para evitar el error "Cannot find name"
-  const displayUserName = studies.length > 0 ? studies[0].userName : "Mi Perfil";
-
   const closeForm = () => {
     setIsAdding(false);
     setEditingStudy(null);
@@ -42,37 +39,59 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Estudios</h1>
           <p className="text-slate-500 mt-1">Tu trayectoria académica y formación profesional.</p>
         </div>
+        {/* Boton de crear */}
         <Button 
-          variant={isAdding || editingStudy ? "ghost" : "primary"}
+          variant={"primary"}
           onClick={() => (isAdding || editingStudy ? closeForm() : setIsAdding(true))}
           className="w-full md:w-auto shadow-xl shadow-indigo-100"
         >
-          {isAdding || editingStudy ? <X size={20} /> : <Plus size={20} />}
-          {isAdding || editingStudy ? "Cancelar" : "Nuevo Estudio"}
+          {isAdding && <Plus size={20} />}
+          Nuevo Estudio
         </Button>
       </header>
 
       {/* Form Section */}
       {(isAdding || editingStudy) && (
-        <div className="animate-in fade-in slide-in-from-top-4 duration-500">
-          <Card title={editingStudy ? "Editar Información" : "Registrar Estudio"}>
-            <StudyForm 
-            onSubmit={handleSubmit}
-            isLoading={createStudyMutation.isPending || updateStudyMutation.isPending}
-            isEditing={!!editingStudy}
-            defaultValues={editingStudy ? {
-              ...editingStudy,
-              // Convertimos a string ISO y cortamos para obtener solo YYYY-MM-DD
-              startDate: new Date(editingStudy.startDate).toISOString().split('T')[0],
-              endDate: editingStudy.endDate 
-                ? new Date(editingStudy.endDate).toISOString().split('T')[0] 
-                : null,
-              userName: displayUserName
-            } : { userName: displayUserName }} 
-            />
-          </Card>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 h-full">
+          {/* Backdrop - Ahora es un hermano del contenido, no el padre */}
+          <div 
+            className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-300" 
+            onClick={closeForm} // Permite cerrar al hacer click fuera
+          />
+
+          {/* Modal Content */}
+          <div className="relative w-full max-w-2xl bg-white rounded-3xl shadow-2xl z-50 overflow-hidden animate-in zoom-in-95 duration-300">
+            
+            {/* Botón Cerrar (X) - Posicionado arriba a la derecha */}
+            <button 
+              onClick={closeForm}
+              className="absolute top-4 right-4 z-50 p-2 rounded-full transition-colors hover:bg-red-100 text-slate-300 hover:text-red-500"
+            >
+              <X size={20} />
+            </button>
+
+            <div className="animate-in fade-in slide-in-from-top-4 duration-500">
+              <Card title={editingStudy ? "Editar Estudio" : "Registrar Nuevo Estudio"}>
+                  <StudyForm 
+                    isAdmin={isAdmin}
+                    onSubmit={handleSubmit}
+                    isLoading={createStudyMutation.isPending || updateStudyMutation.isPending}
+                    isEditing={!!editingStudy}
+                    defaultValues={editingStudy ? {
+                      ...editingStudy,
+                      startDate: new Date(editingStudy.startDate).toISOString().split('T')[0],
+                      endDate: editingStudy.endDate 
+                        ? new Date(editingStudy.endDate).toISOString().split('T')[0] 
+                        : null,
+                      userName: editingStudy?.userName
+                    }: undefined} 
+                  />
+              </Card>
+            </div>
+          </div>
         </div>
       )}
+
 
       {/* Grid de Estudios */}
       <div className="grid gap-6 md:grid-cols-2">
@@ -84,10 +103,10 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
               </div>
               
               <div className="flex gap-2 transition-opacity duration-300">
-                <button onClick={() => setEditingStudy(study)} className="p-2 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
+                <button onClick={() => setEditingStudy(study)} className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all">
                   <Edit3 size={20} />
                 </button>
-                <button onClick={() => confirm("¿Eliminar?") && deleteStudyMutation.mutate(study.id)} className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
+                <button onClick={() => confirm("¿Eliminar?") && deleteStudyMutation.mutate(study.id)} className="p-3 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all">
                   <Trash2 size={20} />
                 </button>
               </div>
@@ -98,10 +117,19 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
               <p className="text-indigo-600 font-semibold">{study.institution}</p>
             </div>
 
-            <div className="mt-8 flex items-center gap-4 text-xs font-bold text-slate-400 bg-slate-50 px-4 py-2 rounded-xl w-fit border border-slate-100">
+            <div className="mt-3 flex items-center gap-4 text-xs font-bold text-slate-400 bg-slate-50 px-4 py-2 rounded-xl w-fit border border-slate-100">
               <Calendar size={14} />
               <span>{new Date(study.startDate).getFullYear()} — {study.endDate ? new Date(study.endDate).getFullYear() : "Actualidad"}</span>
             </div>
+            {
+              isAdmin &&
+                <div className="flex items-center justify-between mt-3 border-t border-slate-50">
+                  <span className="px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">
+                    Propiedad de: {study.userName || 'indefinido'}
+                  </span>
+                  <span className="text-[10px] text-slate-300 font-bold">UID: {study.id}</span>
+                </div>
+            }
           </div>
         ))}
       </div>
