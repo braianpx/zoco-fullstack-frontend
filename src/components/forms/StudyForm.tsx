@@ -101,7 +101,7 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing, isAdm
           type="date"
           error={errors.endDate?.message}
           {...register("endDate", { 
-            validate: (v) => validateStudyField("endDate", v || "", getValues() as any) || true 
+            validate: (v) => validateStudyField("endDate", v || "", getValues()) || true 
           })} 
         />
       </div>

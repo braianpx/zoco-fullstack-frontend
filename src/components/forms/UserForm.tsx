@@ -2,7 +2,7 @@ import { useForm } from "react-hook-form";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
 import { validateUserField } from "./validators/new.user.validator"; 
-import { MapPin, GraduationCap, Shield, History, Calendar, UserCheck } from "lucide-react";
+import { MapPin, GraduationCap, Shield, History, Calendar } from "lucide-react";
 import type { UserCreate, UserResponse, UserUpdate } from "../../types/user.types";
 import { useAuth } from "../../context/auth/useAuth";
 import type { SessionLogResponse } from "../../types/sessionLogs.types";

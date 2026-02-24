@@ -1,7 +1,6 @@
-interface ProfileStatsProps {
-  roleName?: string;
-  createdAt?: Date;
-}
+import type { UserResponse } from "../types/user.types";
+
+type ProfileStatsProps = Pick<UserResponse, "roleName" | "createdAt">;
 
 export const ProfileStats = ({ roleName, createdAt }: ProfileStatsProps) => (
   <aside className="space-y-6">

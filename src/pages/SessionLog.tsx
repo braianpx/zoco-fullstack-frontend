@@ -39,7 +39,7 @@ export const SessionLog = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-6 space-y-10 animate-in fade-in duration-700">
+    <div className="max-w-6xl mx-auto p-6 space-y-10 animate-in fade-in duration-300">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-100 pb-8 gap-6">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-600 rounded-full mb-3 border border-amber-100">
@@ -52,7 +52,8 @@ export const SessionLog = () => {
       </header>
 
       {editingLog && (
-        <div className="animate-in fade-in slide-in-from-top-4 duration-500 max-w-lg mx-auto w-full mb-10">
+        // Animación de formulario más rápida (300ms) para que responda al clic del usuario
+        <div className="animate-in fade-in slide-in-from-top-2 duration-300 max-w-lg mx-auto w-full mb-10">
           <Card title={`Cerrar sesión: ${editingLog.userName}`}>
             <SessionLogForm
               startDate={editingLog.startDate}
@@ -66,10 +67,14 @@ export const SessionLog = () => {
 
       <div className="grid gap-4">
         {logs.map((log) => (
-          <div key={log.id} className="group bg-white border border-slate-200 rounded-4xl p-6 hover:shadow-2xl transition-all duration-500">
+          <div 
+            key={log.id} 
+            // Reducimos duration-500 a duration-300 en el hover para que la sombra aparezca más rápido
+            className="group bg-white border border-slate-200 rounded-4xl p-6 hover:shadow-xl transition-all duration-500"
+          >
             <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
               <div className="flex items-center gap-4">
-                <div className="p-4 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors duration-500">
+                <div className="p-4 bg-slate-50 text-slate-400 rounded-2xl group-hover:bg-indigo-50 group-hover:text-indigo-600 transition-colors duration-300">
                   <UserIcon size={24} />
                 </div>
                 <div>
@@ -95,18 +100,17 @@ export const SessionLog = () => {
                   {!log.endDate && (
                     <button 
                       onClick={() => {
-                        handleUpdateSession({endDate: new Date()})
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
                         setEditingLog(log);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
                       }} 
-                      className="p-3 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
+                      className="p-3 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors duration-200"
                     >
                       <Edit3 size={20} />
                     </button>
                   )}
                   <button 
                     onClick={() => confirm("¿Eliminar registro?") && deleteMutation.mutate(log.id)}
-                    className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                    className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200"
                   >
                     <Trash2 size={20} />
                   </button>

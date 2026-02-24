@@ -5,7 +5,6 @@ import { useAddressGetters } from "../hooks/useAddressGetters";
 import { useAddressMutations } from "../hooks/useAddressMutations";
 import { AddressForm } from "../components/forms/AddressForm";
 import { Button } from "../components/ui/Button";
-import { mapErrors } from "../components/forms/mapErrors";
 // Usamos los mismos iconos que en Study
 import { Trash2, Edit3, MapPin, Plus, X } from "lucide-react"; 
 import type { AddressResponse, AddressCreate } from "../types/address.types";
@@ -20,11 +19,8 @@ export const Address = () => {
 
   const [isAdding, setIsAdding] = useState(false);
   const [editing, setEditing] = useState<AddressResponse | null>(null);
-  const [backendErrors, setBackendErrors] = useState<Record<string, string>>({});
 
   const handleAction = async (data: AddressCreate, id?: number) => {
-    try {
-      setBackendErrors({});
       if (id) {
         await updateAddressMutation.mutateAsync({ data, addressId: id });
         setEditing(null);
@@ -32,9 +28,7 @@ export const Address = () => {
         await createAddressMutation.mutateAsync(data);
         setIsAdding(false);
       }
-    } catch (err) {
-      setBackendErrors(mapErrors(err));
-    }
+      closeForm();
   };
 
   const closeForm = () => {
@@ -120,7 +114,7 @@ export const Address = () => {
                    {/* BOTONES IGUALES A STUDY (Aparecen al hacer hover en desktop) */}
                    <div className="flex gap-2 transition-opacity duration-300">
                      <button 
-                       onClick={() => { setEditing(address); setBackendErrors({}); }} 
+                       onClick={() =>  setEditing(address) } 
                        className="p-3 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"
                      >
                        <Edit3 size={20} />
@@ -144,7 +138,7 @@ export const Address = () => {
                       CP: {address.postalCode || 'N/A'}
                     </span>
                   </div>
-                  { true &&
+                  { isAdmin &&
                       <div className="flex items-center justify-between mt-3 border-t border-slate-50">
                         <span className="max-w-48 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">
                           Propiedad de: {address?.userName || 'indefinido'}

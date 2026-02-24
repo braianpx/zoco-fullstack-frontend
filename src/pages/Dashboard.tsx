@@ -8,11 +8,15 @@ import { useEffect } from "react";
 
 export const Dashboard: FC = () => {
   const { role } = useAuth();
-  const [selectedSection, setSelectedSection] = useState<DashboardSection>("Perfil");
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-
-  const navigate = useNavigate();
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const currentSection: DashboardSection = (Object.keys(SECTION_ROUTES).find(
+  (key) => SECTION_ROUTES[key as DashboardSection] === location.pathname
+) as DashboardSection) ?? "";
+
+  const [selectedSection, setSelectedSection] = useState<DashboardSection>(currentSection);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   const handleSelectSection = (section: string) => {
     if (section in SECTION_ROUTES) {
@@ -24,11 +28,10 @@ export const Dashboard: FC = () => {
   };
   
     useEffect(() => {
-      if (location.pathname === "/dashboard") {
+      if (location.pathname == "/dashboard") {
         navigate("/dashboard/profile", { replace: true });
       }
     }, [location.pathname, navigate]);
-
 
   return (
     // h-[calc(100vh-84px)] asumiendo que tu Navbar mide 84px. 
