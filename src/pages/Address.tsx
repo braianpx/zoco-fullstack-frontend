@@ -140,7 +140,7 @@ export const Address = () => {
                   </div>
                   { isAdmin &&
                       <div className="flex items-center justify-between mt-3 border-t border-slate-50">
-                        <span className="max-w-48 px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">
+                        <span className="max-w-[85%] px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest bg-slate-100 text-slate-500">
                           Propiedad de: {address?.userName || 'indefinido'}
                         </span>
                         <span className="text-[10px] text-slate-300 font-bold">UID: {address?.id}</span>
