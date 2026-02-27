@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useUserDetail, useUserGetters } from "../hooks/useUserGetters";
-import { useUserMutations } from "../hooks/useUserMutations";
+import { useUserDetail, useUserGetters, useUserMutations } from "../hooks/user";
+import { useAuth } from "../context/auth/useAuth";
 import { UserForm, type UserFormType } from "../components/forms/UserForm";
 import { Button } from "../components/ui/Button";
 import { 
@@ -11,8 +11,9 @@ import {
 import type { UserResponse, UserCreate, UserUpdate } from "../types/user.types";
 
 export const User = () => {
-  const { users, isLoading: isLoadingList } = useUserGetters();
-  const { createMutation, updateMutation, deleteMutation } = useUserMutations();
+  const { user } = useAuth();
+  const { users, isLoading: isLoadingList } = useUserGetters(user);
+  const { createUserMutation, updateUserMutation, deleteUserMutation, isPending } = useUserMutations();
   
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -21,12 +22,12 @@ export const User = () => {
  
   const handleAction = async (data: UserFormType) => {
     if (selectedUserId) {
-      await updateMutation.mutateAsync({ 
+      await updateUserMutation.mutateAsync({ 
         data: data as UserUpdate, 
         userId: selectedUserId 
       });
     } else {
-      await createMutation.mutateAsync(data as UserCreate);
+      await createUserMutation.mutateAsync(data as UserCreate);
     }
     closeModal();
   };
@@ -88,7 +89,7 @@ export const User = () => {
               ) : (
                 <UserForm 
                   onSubmit={handleAction}
-                  isLoading={createMutation.isPending || updateMutation.isPending}
+                  isLoading={isPending}
                   isEditing={!!selectedUserId}
                   defaultValues={detailedUser ?? undefined}
                 />
@@ -108,7 +109,7 @@ export const User = () => {
               </div>
               <div className="flex gap-2">
                 <button onClick={() => openEdit(u)} className="p-3 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-xl"><ExternalLink size={20} /></button>
-                <button onClick={() => confirm("¿Borrar?") && deleteMutation.mutate(u.id)} className="p-3 text-slate-400 hover:text-red-600 bg-slate-50 rounded-xl"><Trash2 size={20} /></button>
+                <button onClick={() => confirm("¿Borrar?") && deleteUserMutation.mutate(u.id)} className="p-3 text-slate-400 hover:text-red-600 bg-slate-50 rounded-xl"><Trash2 size={20} /></button>
               </div>
             </div>
 

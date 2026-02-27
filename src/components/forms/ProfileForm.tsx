@@ -4,7 +4,7 @@ import { Button } from "../ui/Button";
 import { FormErrorList } from "../ui/FormErrorList";
 import { PersonalInfoSection } from "../PersonalInfoSection";
 import { SecurityPassword } from "../SecurityPassword";
-import { useUserMutations } from "../../hooks/useUserMutations";
+import { useUserMutations } from "../../hooks/user";
 import { useAuth } from "../../context/auth/useAuth";
 import { validateProfileForm, type ProfileFormType } from "./validators/profile.validator";
 import { validateUserField, type UserFormType } from "./validators/user.validator";
@@ -13,9 +13,11 @@ import { searchErrors } from "./searchErrors";
 import type { UserResponse, UserUpdate } from "../../types/user.types";
 
 export const ProfileForm = ({ user }: { user: UserResponse }) => {
-  const { role } = useAuth();
-  const { updateMutation } = useUserMutations();
-  const isPending = updateMutation.isPending;
+  const { user: authUser } = useAuth();
+  const { updateUserMutation } = useUserMutations();
+  const isPending = updateUserMutation.isPending;
+
+  const role = authUser?.roleName;
 
   const fields = useMemo(() => [
     { name: "firstName", label: "Nombre", type: "text" },
@@ -62,7 +64,7 @@ export const ProfileForm = ({ user }: { user: UserResponse }) => {
         delete dataToSubmit.password;
       }
       
-      await updateMutation.mutateAsync({ 
+      await updateUserMutation.mutateAsync({ 
         data: dataToSubmit as UserUpdate, 
         userId: user.id 
       });
@@ -128,7 +130,7 @@ export const ProfileForm = ({ user }: { user: UserResponse }) => {
         <Button 
           type="submit" 
           variant="primary" 
-          disabled={!isDirty || searchErrors(errors, updateMutation)}
+          disabled={!isDirty || searchErrors(errors, updateUserMutation)}
         >
           {isPending ? "Guardando..." : "Actualizar Perfil"}
         </Button>

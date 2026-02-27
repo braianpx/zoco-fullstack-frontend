@@ -10,11 +10,9 @@ import { SessionLog } from "./pages/SessionLog";
 import { User } from "./pages/User";
 import { ProtectedRoute } from "./components/routing/ProtectedRoute";
 import { PublicRoute } from "./components/routing/PublicRoute";
-import { useAuth } from "./context/auth/useAuth";
+import { ProtectedRouteAdmin } from "./components/routing/ProtectedRouteAdmin";
 
 function App() {
-  const { user } = useAuth();
-  const isAdmin = user?.roleName === "Admin";
 
   return (
     <BrowserRouter>
@@ -31,23 +29,16 @@ function App() {
             {/* Sub-rutas de Dashboard */}
             <Route path="profile" element={<Profile />} />
             <Route path="addresses" element={<Address />} />
-            <Route 
-              path="studies" 
-              element={<Study userId={user?.id ?? null} isAdmin={isAdmin} />} 
-            />
+            <Route path="studies" element={<Study />} />
+            {/* 3. RUTAS DE ADMINISTRADOR */}
+            <Route path="users" element={<ProtectedRouteAdmin> <User /> </ProtectedRouteAdmin>} />
+            <Route path="logs" element={<ProtectedRouteAdmin> <SessionLog /> </ProtectedRouteAdmin>} />
 
-            {/* 3. RUTAS DE ADMINISTRADOR (Protección extra por Rol) */}
-            {isAdmin && (
-              <>
-                <Route path="users" element={<ProtectedRoute> <User /> </ProtectedRoute>} />
-                <Route path="logs" element={<ProtectedRoute> <SessionLog /> </ProtectedRoute>} />
-              </>
-            )}
           </Route>
         </Route>
 
         {/* Redirección por defecto */}
-        <Route path="*" element={<Navigate to={user ? "/dashboard" : "/"} replace />} />
+        <Route path="*" element={<Navigate to={"/"} replace />} />
       </Routes>
     </BrowserRouter>
   );

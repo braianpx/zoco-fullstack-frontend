@@ -1,17 +1,19 @@
 import { useState } from "react";
-import { useStudyGetters } from "../hooks/useStudyGetters";
-import { useStudyMutations } from "../hooks/useStudyMutations";
+import { useStudyGetters, useStudyMutations } from "../hooks/study";
 import { StudyForm, type StudyFormType } from "../components/forms/StudyForm";
 import { Card } from "../components/ui/Card"; 
 import { Button } from "../components/ui/Button";
 import { Trash2, Edit3, Plus, X, GraduationCap, Calendar } from "lucide-react"; 
-import type { StudyResponse, StudyCreate, StudyUpdate } from "../types/study.types";
+import type { StudyResponse } from "../types/study.types";
+import { useAuth } from "../context/auth/useAuth";
 
-export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boolean }) => {
+export const Study = () => {
   const [editingStudy, setEditingStudy] = useState<StudyResponse | null>(null);
   const [isAdding, setIsAdding] = useState(false);
   
-  const { studies, isLoading } = useStudyGetters(userId, isAdmin);
+  const { user } = useAuth();
+
+  const { studies, isLoading, isAdmin } = useStudyGetters(user);
   const { createStudyMutation, updateStudyMutation, deleteStudyMutation } = useStudyMutations();
 
   const closeForm = () => {
@@ -20,11 +22,10 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
   };
 
   const handleSubmit = async (data: StudyFormType) => {
-    const payload = { ...data, endDate: data.endDate === "" ? null : data.endDate };
     if (editingStudy) {
-      await updateStudyMutation.mutateAsync({ data: payload as StudyUpdate, studyId: editingStudy.id });
+      await updateStudyMutation.mutateAsync({ data, studyId: editingStudy.id });
     } else {
-      await createStudyMutation.mutateAsync(payload as StudyCreate);
+      await createStudyMutation.mutateAsync(data);
     }
     closeForm();
   };
@@ -73,7 +74,6 @@ export const Study = ({ userId, isAdmin }: { userId: number | null, isAdmin: boo
             <div className="animate-in fade-in slide-in-from-top-4 duration-500">
               <Card title={editingStudy ? "Editar Estudio" : "Registrar Nuevo Estudio"}>
                   <StudyForm 
-                    isAdmin={isAdmin}
                     onSubmit={handleSubmit}
                     isLoading={createStudyMutation.isPending || updateStudyMutation.isPending}
                     isEditing={!!editingStudy}

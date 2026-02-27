@@ -26,8 +26,19 @@ export const AddressForm = ({ onSubmit, defaultValues, isLoading, isEditing, isA
 
   const userName = defaultValues?.userName;
 
+  // convert empty postalCode to null before sending, since the API
+  // expects `null`/undefined and react-hook-form returns empty string if
+  // the input is cleared. this mirrors the date handling in StudyForm.
+  const handleLocalSubmit = (data: AddressCreate) => {
+    const normalized: AddressCreate = {
+      ...data,
+      postalCode: data.postalCode === "" ? null : data.postalCode,
+    };
+    onSubmit(normalized);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+    <form onSubmit={handleSubmit(handleLocalSubmit)} className="space-y-6 mt-4">
       {/* Banner Informativo para Admin - Idéntico a Estudios */}
       {userName && isAdmin && (
         <div className="flex items-center gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 mb-6 group transition-all hover:bg-indigo-50">

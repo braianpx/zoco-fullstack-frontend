@@ -1,23 +1,27 @@
 // src/components/dashboard/Sidebar.tsx
 import type { FC } from "react";
+import { useAuth } from "../context/auth/useAuth";
 
 interface SidebarProps {
-  role: string | null;
   selectedSection: string;
   onSelectSection: (section: string) => void;
   isOpen: boolean;
   onClose: () => void;
 }
 
+const sectionsRole = {
+  user: ["Perfil", "Direcciones", "Estudios"],
+  admin: ["Perfil", "Direcciones", "Estudios", "SessionLogs", "Usuarios"]
+};;
+
 export const Sidebar: FC<SidebarProps> = ({
-  role,
   selectedSection,
   onSelectSection,
   isOpen,
   onClose,
 }) => {
-  const sections = ["Perfil", "Direcciones", "Estudios"];
-  if (role === "Admin") sections.push("SessionLogs", "Usuarios");
+  const { isAdmin } = useAuth();
+  const sections = isAdmin ? sectionsRole.admin : sectionsRole.user;
 
   return (
     <>

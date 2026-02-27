@@ -8,7 +8,7 @@ export const createStudy = async (data: StudyCreate) => {
 };
 
 export const getStudiesUser = async (userId: number) => {
-  const res = await api.get<ApiResponse<StudyResponse>>("studies/user/"+ userId);
+  const res = await api.get<ApiResponse<StudyResponse[]>>("studies/user/"+ userId);
   return res.data;
 };
 

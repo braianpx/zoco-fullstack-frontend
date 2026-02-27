@@ -7,8 +7,13 @@ export const createAddress = async (data: AddressCreate) => {
   return res.data;
 };
 
+// the user lookup returns a list of addresses (one per user may have many)
+// older implementation mistakenly typed it as a single AddressResponse which
+// caused our generic helpers to treat the result as an object instead of an
+// array and led to runtime/typing errors when the query attempted to iterate
+// over the data. correcting the return type to an array fixes the problem.
 export const getAddressesUser = async (userId: number) => {
-  const res = await api.get<ApiResponse<AddressResponse>>("Addresses/user/"+ userId);
+  const res = await api.get<ApiResponse<AddressResponse[]>>("Addresses/user/" + userId);
   return res.data;
 };
 

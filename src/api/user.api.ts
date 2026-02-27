@@ -23,6 +23,6 @@ export const getAllUser = async () => {
 };
 
 export const deleteOneUser = async (userId: number) => {
-  const res = await api.put<ApiResponse<UserResponse>>("users/"+ userId);
+  const res = await api.delete<ApiResponse<UserResponse>>("users/"+ userId);
   return res.data;
 };

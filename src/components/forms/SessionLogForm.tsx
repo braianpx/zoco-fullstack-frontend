@@ -16,6 +16,7 @@ export const SessionLogForm = ({ startDate, onSubmit, onCancel, isLoading }: Pro
     .toISOString()
     .slice(0, 16);
 
+  console.log(startDate)
   // Tipamos el formulario internamente como string
   const { 
     register, 

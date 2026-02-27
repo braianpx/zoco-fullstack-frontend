@@ -5,11 +5,12 @@ import { Button } from "../../components/ui/Button";
 import { Input } from "../../components/ui/Input";
 import { validateStudyField } from "./validators/study.validator";
 import { UserCheck } from "lucide-react";
+import { useAuth } from "../../context/auth/useAuth";
 
 // Definimos el tipo exacto que manejará el estado interno del formulario
 export type StudyFormType = Omit<StudyCreate, 'startDate' | 'endDate'> & {
   startDate: string;
-  endDate: string | "";
+  endDate: string | null;
   userName?: string; 
 };
 
@@ -18,11 +19,10 @@ interface Props {
   defaultValues?: StudyResponse;
   isLoading: boolean;
   isEditing?: boolean;
-  isAdmin: boolean;
 }
 
-export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing, isAdmin }: Props) => {
-  
+export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing }: Props) => {
+  const { isAdmin } = useAuth();
   // Función interna para transformar Date | string -> YYYY-MM-DD
   const formatToInputDate = (date: Date | string | null | undefined): string => {
     if (!date) return "";
@@ -52,8 +52,18 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing, isAdm
     }
   }, [initialData, reset]);
 
+  // internal submit handler normalizes empty endDate to null because react-hook-form
+  // returns an empty string when the date input is cleared. the API expects null.
+  const handleLocalSubmit = (data: StudyFormType) => {
+    const normalized: StudyFormType = {
+      ...data,
+      endDate: data.endDate === "" ? null : data.endDate,
+    };
+    onSubmit(normalized);
+  };
+
   return (
-    <form onSubmit={handleSubmit(onSubmit)} className="space-y-6 mt-4">
+    <form onSubmit={handleSubmit(handleLocalSubmit)} className="space-y-6 mt-4">
       {initialData?.userName && isAdmin && (
         <div className="flex items-center gap-3 p-4 bg-indigo-50/50 rounded-2xl border border-indigo-100 mb-6 group transition-all hover:bg-indigo-50">
           <div className="relative">
@@ -65,7 +75,7 @@ export const StudyForm = ({ onSubmit, defaultValues, isLoading, isEditing, isAdm
             </div>
           </div>
           <div className="flex flex-col">
-            <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-[0.1em] leading-none mb-1">
+            <span className="text-[10px] font-extrabold text-indigo-400 uppercase tracking-widest leading-none mb-1">
               Gestión de Usuario (Modo Admin)
             </span>
             <div className="flex items-center gap-1 text-sm font-semibold text-slate-700">

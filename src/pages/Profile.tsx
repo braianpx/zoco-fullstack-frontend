@@ -1,4 +1,4 @@
-import { useUserDetail } from "../hooks/useUserGetters"; // Cambiado a useUserDetail
+import { useUserDetail } from "../hooks/user"; // Cambiado a useUserDetail
 import { ProfileForm } from "../components/forms/ProfileForm";
 import { HeaderSection } from "../components/ui/HeaderSection";
 import { ProfileStats } from "../components/ProfileStats";

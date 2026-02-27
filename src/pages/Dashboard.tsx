@@ -1,13 +1,11 @@
 // src/pages/Dashboard.tsx
 import { type FC, useState } from "react";
 import { Sidebar } from "../components/Sidebar";
-import { useAuth } from "../context/auth/useAuth";
 import { Outlet, useNavigate, useLocation } from "react-router-dom";
 import { SECTION_ROUTES, type DashboardSection } from "../utils/routes";
 import { useEffect } from "react";
 
 export const Dashboard: FC = () => {
-  const { role } = useAuth();
   const location = useLocation();
   const navigate = useNavigate();
 
@@ -28,14 +26,12 @@ export const Dashboard: FC = () => {
   };
   
     useEffect(() => {
-      if (location.pathname == "/dashboard") {
+      if (location.pathname == "/dashboard" || location.pathname == "/dashboard/") {
         navigate("/dashboard/profile", { replace: true });
       }
     }, [location.pathname, navigate]);
 
   return (
-    // h-[calc(100vh-84px)] asumiendo que tu Navbar mide 84px. 
-    // Ajusta el valor si la Navbar es más alta o baja.
     <div className="flex h-[calc(100vh-10px)] w-full overflow-hidden bg-[#F9FAFB] relative">
       
       {/* Botón flotante para abrir el menú en Móvil */}
@@ -49,14 +45,12 @@ export const Dashboard: FC = () => {
       </button>
 
       <Sidebar
-        role={role}
         selectedSection={selectedSection}
         onSelectSection={handleSelectSection}
         isOpen={isSidebarOpen}
         onClose={() => setIsSidebarOpen(false)}
       />
-
-      {/* El contenido principal nunca es cubierto por el Sidebar en LG */}
+      
     <main className="flex-1 bg-white lg:shadow-inner lg:rounded-tl-[2.5rem] overflow-y-auto scroll-smooth p-4 mt-12 md:p-10 md:mt-6">
       <Outlet />
     </main>

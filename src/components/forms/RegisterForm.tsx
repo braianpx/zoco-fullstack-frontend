@@ -7,7 +7,7 @@ import { FormErrorList } from "../ui/FormErrorList";
 import { validateUserField, type UserFormType } from "./validators/user.validator";
 import { mapErrors } from "./mapErrors";
 import { searchErrors } from "./searchErrors";
-import { useUserMutations } from "../../hooks/useUserMutations";
+import { useUserMutations } from "../../hooks/user";
 import type { UserCreate } from "../../types/user.types";
 
 const FIELDS = [
@@ -20,7 +20,7 @@ const FIELDS = [
 
 export const RegisterForm = () => {
   const navigate = useNavigate();
-  const { createMutation } = useUserMutations();
+  const { createUserMutation } = useUserMutations();
 
   const [form, setForm] = useState({
     firstName: "",
@@ -57,7 +57,7 @@ export const RegisterForm = () => {
       // y configuramos el objeto de salida con el tipo correcto (UserCreate)
       const { ...dataToSubmit } = form;
      
-      await createMutation.mutateAsync(dataToSubmit as UserCreate);
+      await createUserMutation.mutateAsync(dataToSubmit as UserCreate);
 
       navigate("/login");
     } catch (err) {
@@ -98,9 +98,9 @@ export const RegisterForm = () => {
         type="submit"
         variant="primary"
         className="w-full py-4 mt-2 shadow-lg shadow-indigo-100"
-        disabled={createMutation.isPending || searchErrors(errors, createMutation)}
+        disabled={createUserMutation.isPending || searchErrors(errors, createUserMutation)}
       >
-        {createMutation.isPending ? "Creando cuenta..." : "Registrarse"}
+        {createUserMutation.isPending ? "Creando cuenta..." : "Registrarse"}
       </Button>
     </form>
   );

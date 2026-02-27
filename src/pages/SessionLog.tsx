@@ -1,22 +1,18 @@
 import { useState } from "react";
-import { useSessionLogGetters } from "../hooks/useSessionLogGetters";
-import { useSessionLogMutations } from "../hooks/useSessionLogMutations";
+import { useSessionLogGetters, useSessionLogMutations } from "../hooks/sessionLog";
+import { useAuth } from "../context/auth/useAuth";
 import { SessionLogForm } from "../components/forms/SessionLogForm";
 import { Card } from "../components/ui/Card";
 import { ShieldAlert, Trash2, Clock, Calendar, User as UserIcon, Edit3 } from "lucide-react";
-import { useAuth } from "../context/auth/useAuth";
-import { Navigate } from "react-router-dom";
 import type { SessionLogResponse } from "../types/sessionLogs.types";
 
 export const SessionLog = () => {
-  const { role } = useAuth();
-  const { logs, isLoading } = useSessionLogGetters();
-  const { deleteMutation, updateMutation } = useSessionLogMutations();
+  const { user } = useAuth();
+  const { logs, isLoading } = useSessionLogGetters(user);
+  const { deleteSessionLogMutation, updateSessionLogMutation, isPending } = useSessionLogMutations();
   
   // CORRECCIÓN: Tipado correcto en lugar de 'any'
   const [editingLog, setEditingLog] = useState<SessionLogResponse | null>(null);
-
-  if (role !== "Admin") return <Navigate to="/dashboard/profile" replace />;
 
   if (isLoading) return (
     <div className="p-20 text-center animate-pulse text-slate-400 font-bold uppercase tracking-widest">
@@ -26,41 +22,38 @@ export const SessionLog = () => {
 
   const handleUpdateSession = async (formData: { endDate: Date }) => {
     if (!editingLog) return;
-    
-    try {
-      await updateMutation.mutateAsync({ 
+      await updateSessionLogMutation.mutateAsync({ 
         data: { endDate: formData.endDate }, 
         sessionId: editingLog.id 
       });
       setEditingLog(null);
-    } catch (error) {
-      console.error("Error al actualizar:", error);
-    }
   };
 
   return (
     <div className="max-w-6xl mx-auto p-6 space-y-10 animate-in fade-in duration-300">
       <header className="flex flex-col md:flex-row justify-between items-start md:items-end border-b border-slate-100 pb-8 gap-6">
         <div>
+          {/* se puede componetizar */}
           <div className="inline-flex items-center gap-2 px-3 py-1 bg-amber-50 text-amber-600 rounded-full mb-3 border border-amber-100">
             <ShieldAlert size={14} />
             <span className="text-xs font-bold uppercase tracking-widest">Admin Control</span>
           </div>
+
           <h1 className="text-4xl font-black text-slate-900 tracking-tight">Logs de Sesión</h1>
           <p className="text-slate-500 mt-1">Gestión de tiempos de conexión y auditoría.</p>
         </div>
       </header>
 
+      {/* Modal de edicion de log */}
       {editingLog && (
-        // Animación de formulario más rápida (300ms) para que responda al clic del usuario
         <div className="animate-in fade-in slide-in-from-top-2 duration-300 max-w-lg mx-auto w-full mb-10">
           <Card title={`Cerrar sesión: ${editingLog.userName}`}>
             <SessionLogForm
-              startDate={editingLog.startDate}
-              isLoading={updateMutation.isPending}
-              onCancel={() => setEditingLog(null)}
-              onSubmit={handleUpdateSession}
-            />
+                startDate={editingLog.startDate}
+                isLoading={isPending}
+                onCancel={() => setEditingLog(null)}
+                onSubmit={handleUpdateSession}
+              />
           </Card>
         </div>
       )}
@@ -101,7 +94,6 @@ export const SessionLog = () => {
                     <button 
                       onClick={() => {
                         setEditingLog(log);
-                        window.scrollTo({ top: 0, behavior: 'smooth' });
                       }} 
                       className="p-3 text-slate-300 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-colors duration-200"
                     >
@@ -109,7 +101,7 @@ export const SessionLog = () => {
                     </button>
                   )}
                   <button 
-                    onClick={() => confirm("¿Eliminar registro?") && deleteMutation.mutate(log.id)}
+                    onClick={() => confirm("¿Eliminar registro?") && deleteSessionLogMutation.mutate(log.id)}
                     className="p-3 text-slate-300 hover:text-red-500 hover:bg-red-50 rounded-xl transition-colors duration-200"
                   >
                     <Trash2 size={20} />

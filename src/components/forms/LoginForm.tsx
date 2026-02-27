@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Input } from "../ui/Input";
 import { Button } from "../ui/Button";
-import { useAuthMutations } from "../../hooks/useAuthMutations";
+import { useAuthMutations } from "../../hooks/auth";
 // CORRECCIÓN: Cambiado validateRegisterField por validateUserField
 import { validateUserField } from "./validators/user.validator"; 
 import { mapErrors } from "./mapErrors";

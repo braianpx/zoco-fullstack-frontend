@@ -40,7 +40,7 @@ export const AuthProvider = ({ children }: { children: React.ReactNode }) => {
       login,
       logout,
       // Forzamos el tipo Role para que coincida con AuthContextType
-      role: (user?.roleName || "User") as Role, 
+      isAdmin: user?.roleName === "Admin",
     }),
     [user, token]
   );

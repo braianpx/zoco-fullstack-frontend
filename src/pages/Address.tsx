@@ -1,8 +1,7 @@
 // src/pages/AddressesPage.tsx
 import { useState } from "react";
 import { useAuth } from "../context/auth/useAuth";
-import { useAddressGetters } from "../hooks/useAddressGetters";
-import { useAddressMutations } from "../hooks/useAddressMutations";
+import { useAddressGetters, useAddressMutations } from "../hooks/address";
 import { AddressForm } from "../components/forms/AddressForm";
 import { Button } from "../components/ui/Button";
 // Usamos los mismos iconos que en Study
@@ -11,24 +10,23 @@ import type { AddressResponse, AddressCreate } from "../types/address.types";
 import { Card } from "../components/ui/Card";
 
 export const Address = () => {
-  const { user, role } = useAuth();
-  const isAdmin = role === "Admin";
+  const { user } = useAuth();
 
-  const { addresses, isLoading } = useAddressGetters(user?.id || null, isAdmin);
+  const { addresses, isLoading, isAdmin } = useAddressGetters(user);
   const { createAddressMutation, updateAddressMutation, deleteAddressMutation, isPending } = useAddressMutations();
 
   const [isAdding, setIsAdding] = useState(false);
   const [editing, setEditing] = useState<AddressResponse | null>(null);
 
   const handleAction = async (data: AddressCreate, id?: number) => {
-      if (id) {
-        await updateAddressMutation.mutateAsync({ data, addressId: id });
-        setEditing(null);
-      } else {
-        await createAddressMutation.mutateAsync(data);
-        setIsAdding(false);
-      }
-      closeForm();
+    if (id) {
+      await updateAddressMutation.mutateAsync({ data, addressId: id });
+      setEditing(null);
+    } else {
+      await createAddressMutation.mutateAsync(data);
+      setIsAdding(false);
+    }
+    closeForm();
   };
 
   const closeForm = () => {
@@ -86,7 +84,9 @@ export const Address = () => {
             <div className="animate-in fade-in slide-in-from-top-4 duration-500">
               <Card title={editing ? "Editar Dirección" : "Registrar Nueva Dirección"}>
                 <AddressForm 
-                  onSubmit={handleAction} // Simplificado: ya recibe los datos del form
+                  // pass the current editing id so the parent can decide create vs
+                  // update. the form itself only emits the data object.
+                  onSubmit={(data) => handleAction(data, editing?.id)}
                   isLoading={isPending}   // Cambiado de isPending a isLoading (nombre en Estudios)
                   isEditing={!!editing} // Pasamos el booleano si existe ID
                   isAdmin={user?.roleName === "Admin"} // Para activar el banner de Admin
