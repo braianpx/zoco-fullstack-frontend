@@ -1,8 +1,8 @@
 // src/App.tsx
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate, Outlet } from "react-router-dom";
 import { MainLayout } from "./layouts/MainLayout";
 import { Home } from "./pages/Home";
-import { Dashboard } from "./pages/Dashboard";
+// Dashboard component is no longer used; sidebar moved into layout
 import { Profile } from "./pages/Profile";
 import { Address } from "./pages/Address";
 import { Study } from "./pages/Study";
@@ -24,16 +24,25 @@ function App() {
           <Route path="/" element={<PublicRoute><Home /></PublicRoute>} />
 
           {/* 2. RUTAS PROTEGIDAS (Cualquier usuario logueado) */}
-          <Route path="/dashboard" element={<ProtectedRoute><Dashboard /></ProtectedRoute>}>
-            
+          {/* protegemos todo el árbol de rutas de dashboard */}
+          <Route path="/dashboard" element={<ProtectedRoute><Outlet /></ProtectedRoute>}>
+            {/* redirección inicial al perfil */}
+            <Route index element={<Navigate to="profile" replace />} />
+
             {/* Sub-rutas de Dashboard */}
             <Route path="profile" element={<Profile />} />
             <Route path="addresses" element={<Address />} />
             <Route path="studies" element={<Study />} />
-            {/* 3. RUTAS DE ADMINISTRADOR */}
-            <Route path="users" element={<ProtectedRouteAdmin> <User /> </ProtectedRouteAdmin>} />
-            <Route path="logs" element={<ProtectedRouteAdmin> <SessionLog /> </ProtectedRouteAdmin>} />
 
+            {/* 3. RUTAS DE ADMINISTRADOR */}
+            <Route
+              path="users"
+              element={<ProtectedRouteAdmin> <User /> </ProtectedRouteAdmin>}
+            />
+            <Route
+              path="logs"
+              element={<ProtectedRouteAdmin> <SessionLog /> </ProtectedRouteAdmin>}
+            />
           </Route>
         </Route>
 

@@ -32,8 +32,8 @@ Puedes ver la interfaz funcionando aquí:
 - **Persistencia de Sesión:** El estado de autenticación se mantiene incluso al refrescar el navegador.
 
 ### 📋 Interfaz de Usuario (UI)
-- **Dashboard de Métricas:** Panel principal con información relevante según el rol del usuario.
-- **Ficha de Usuario Pro:** Modal avanzado que centraliza:
+**Dashboard de Métricas:** Sección protegida que utiliza un sidebar siempre presente dentro del `MainLayout` para la navegación entre subsecciones.
+  - El sidebar gestiona internamente su propio estado (sección activa, apertura en móvil) y la navegación; no requiere props externas.
   - Gestión de perfiles.
   - Historial de Direcciones y Formación Académica.
   - **Session Logs:** Historial de inicios de sesión con estados visuales (Éxito/Fallo).
