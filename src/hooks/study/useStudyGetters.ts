@@ -4,7 +4,7 @@ import { getStudiesUser, getAllStudies } from "../../api/study.api";
 import { useUserBasedList } from "../../utils/getterHelpers";
 
 export const useStudyGetters = (user: UserResponse | null) => {
-  const { items, isLoading, isAdmin, query } =
+  const { items, isLoading, isAdmin, isError, query } =
     useUserBasedList<StudyResponse>({
       user,
       fetchAll: getAllStudies,
@@ -18,5 +18,6 @@ export const useStudyGetters = (user: UserResponse | null) => {
     studies: items,
     isLoading,
     isAdmin,
+    isError,
   };
 };

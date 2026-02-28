@@ -1,13 +1,15 @@
-// src/hooks/address/useAddressMutations.ts
 import { useStandardMutation } from "../../utils/mutationHelpers";
 import { createAddress, updateAddress, deleteAddress } from "../../api/address.api";
 import type { AddressCreate, AddressUpdate, AddressResponse } from "../../types/address.types";
 import type { ApiResponse } from "../../types/apiResponse.types";
+import { useApiHelpers } from "../../utils/apiHelpers";
 
 export const useAddressMutations = () => {
+  const { getErrorMessage } = useApiHelpers();
+
   const createAddressMutation = useStandardMutation<AddressCreate, ApiResponse<AddressResponse>>({
     mutationFn: createAddress,
-    successMsg: "Dirección creada",
+    successMsg: "Direccion creada",
     invalidateKey: "addresses",
   });
 
@@ -16,15 +18,21 @@ export const useAddressMutations = () => {
     ApiResponse<AddressResponse>
   >({
     mutationFn: ({ data, addressId }) => updateAddress(data, addressId),
-    successMsg: "Se actualizó correctamente",
+    successMsg: "Se actualizo correctamente",
     invalidateKey: "addresses",
   });
 
   const deleteAddressMutation = useStandardMutation<number, ApiResponse<null>>({
     mutationFn: addressId => deleteAddress(addressId),
-    successMsg: "Eliminado con éxito",
+    successMsg: "Eliminado con exito",
     invalidateKey: "addresses",
   });
+
+  const firstError =
+    createAddressMutation.error ??
+    updateAddressMutation.error ??
+    deleteAddressMutation.error ??
+    null;
 
   return {
     createAddressMutation,
@@ -34,5 +42,6 @@ export const useAddressMutations = () => {
       createAddressMutation.isPending ||
       updateAddressMutation.isPending ||
       deleteAddressMutation.isPending,
+    isError: firstError ? getErrorMessage(firstError, "Error al gestionar direcciones") : null,
   };
 };

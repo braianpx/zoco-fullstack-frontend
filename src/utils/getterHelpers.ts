@@ -49,5 +49,6 @@ export function useUserBasedList<T>(opts: UserBasedListOptions<T>) {
     items: (query.data as T[]) || [],
     isLoading: query.isLoading,
     isAdmin,
+    isError: query.isError ? opts.errorMessage : null,
   };
 }

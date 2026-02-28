@@ -5,7 +5,7 @@ import { getAddressesUser, getAllAddress } from "../../api/address.api";
 import { useUserBasedList } from "../../utils/getterHelpers";
 
 export const useAddressGetters = (user: UserResponse | null) => {
-  const { items, isLoading, isAdmin, query } =
+  const { items, isLoading, isAdmin, isError, query } =
     useUserBasedList<AddressResponse>({
       user,
       fetchAll: getAllAddress,
@@ -19,5 +19,6 @@ export const useAddressGetters = (user: UserResponse | null) => {
     addresses: items,
     isLoading,
     isAdmin,
+    isError,
   };
 };

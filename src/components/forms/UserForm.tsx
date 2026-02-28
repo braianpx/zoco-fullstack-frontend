@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { Button } from "../ui/Button";
 import { Input } from "../ui/Input";
@@ -24,9 +25,18 @@ export const UserForm = ({ onSubmit, defaultValues, isEditing, isLoading }: Prop
   const isAdmin = currentUser?.roleName === "Admin";
   
   // 1. Casting en defaultValues para evitar el error de asignación
-  const { register, handleSubmit, getValues, formState: { errors } } = useForm<UserFormType>({ 
+  const { register, handleSubmit, getValues, reset, formState: { errors } } = useForm<UserFormType>({ 
     defaultValues: defaultValues as UserFormType 
   });
+
+  useEffect(() => {
+    if (isEditing) {
+      reset(defaultValues as UserFormType);
+      return;
+    }
+
+    reset({});
+  }, [defaultValues, isEditing, reset]);
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">

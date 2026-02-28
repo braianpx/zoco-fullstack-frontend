@@ -31,13 +31,14 @@ export const useApiHelpers = () => {
       ? [key]
       : [key];
 
-    // invalidate each key using prefix matching (exact: false)
-    // so ["users"] matches ["users"], ["users", "all"], ["users", userId], etc.
+    // Invalidate by prefix, but refetch only active observers.
+    // This prevents replaying stale/inactive detail queries (e.g. old user ids)
+    // when mutations run in sequence.
     for (const k of keys) {
       await queryClient.invalidateQueries({
         queryKey: [k],
         exact: false,
-        refetchType: "all",
+        refetchType: "active",
       });
     }
   };

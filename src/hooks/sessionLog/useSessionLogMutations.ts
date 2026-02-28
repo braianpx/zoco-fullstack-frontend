@@ -1,10 +1,12 @@
-// src/hooks/useSessionLogMutations.ts
 import { useStandardMutation } from "../../utils/mutationHelpers";
 import { updateSessionLog, deleteSessionLog } from "../../api/sessionLogs.api";
 import type { SessionLogUpdate, SessionLogResponse } from "../../types/sessionLogs.types";
 import type { ApiResponse } from "../../types/apiResponse.types";
+import { useApiHelpers } from "../../utils/apiHelpers";
 
 export const useSessionLogMutations = () => {
+  const { getErrorMessage } = useApiHelpers();
+
   const updateSessionLogMutation = useStandardMutation<
     { data: SessionLogUpdate; sessionId: number },
     ApiResponse<SessionLogResponse>
@@ -20,9 +22,12 @@ export const useSessionLogMutations = () => {
     invalidateKey: "sessionLogs",
   });
 
+  const firstError = updateSessionLogMutation.error ?? deleteSessionLogMutation.error ?? null;
+
   return {
     updateSessionLogMutation,
     deleteSessionLogMutation,
     isPending: updateSessionLogMutation.isPending || deleteSessionLogMutation.isPending,
+    isError: firstError ? getErrorMessage(firstError, "Error al gestionar logs de sesion") : null,
   };
 };

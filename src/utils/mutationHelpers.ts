@@ -9,12 +9,6 @@ export interface StandardMutationOptions<TVars, TRes extends { message?: string 
   invalidateKey?: string | string[];
 }
 
-/**
- * Wrapper around react-query useMutation that applies the project's
- * standard notification and invalidation behavior.  All hooks in the
- * repo can use this to avoid repeating the same `onSuccess`/`onError`
- * boilerplate.
- */
 export function useStandardMutation<TVars, TRes extends { message?: string }>(
   opts: StandardMutationOptions<TVars, TRes>
 ) {
@@ -22,18 +16,13 @@ export function useStandardMutation<TVars, TRes extends { message?: string }>(
 
   return useMutation<TRes, AxiosError<ApiResponse<null>>, TVars>({
     mutationFn: opts.mutationFn,
+    retry: false,
     onSuccess: async (res: TRes) => {
-      // IMPORTANT: await the invalidation so react-query completes the refetch
-      // before we show the success notification. this ensures UI is updated
-      // synchronously with the notification.
       if (opts.invalidateKey) await invalidate(opts.invalidateKey);
-      notify(res.message ?? opts.successMsg ?? "Operación exitosa", "success");
+      notify(res.message ?? opts.successMsg ?? "Operacion exitosa", "success");
     },
-    onError: err => {
-      notify(
-        getErrorMessage(err, "Error en la operación"),
-        "error"
-      );
+    onError: (err) => {
+      notify(getErrorMessage(err, "Error en la operacion"), "error");
     },
   });
 }
